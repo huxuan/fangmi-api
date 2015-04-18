@@ -17,11 +17,6 @@ from app import models
 
 oauth = Blueprint('oauth', __name__)
 
-@oauth.route('/')
-@oauth.route('/test')
-def test():
-    return 'Hello world from {}!'.format(__name__)
-
 
 class PasswordCredentialRequestValidator(OAuth2RequestValidator):
     """ A custom OAuth2 Request Validator based on the Client, User
@@ -39,12 +34,20 @@ class PasswordCredentialRequestValidator(OAuth2RequestValidator):
 oauthlib = OAuth2Provider(app)
 oauthlib._validator = PasswordCredentialRequestValidator()
 
+
 @oauth.route('/token', methods=['POST'])
 @oauthlib.token_handler
 def access_token():
     return None
 
+
 @oauth.route('/me')
 @oauthlib.require_oauth()
 def me():
     return jsonify(message="Logged In!")
+
+
+@oauth.route('/')
+@oauth.route('/test')
+def test():
+    return 'Hello world from {}!'.format(__name__)
