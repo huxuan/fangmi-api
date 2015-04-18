@@ -47,7 +47,7 @@ class User(db.Model):
     password = db.Column(db.String(32), nullable=False)
 
     # Online Profile.
-    nickname = db.Column(db.String(64), nullable=False, unique=True, index=True)
+    nickname = db.Column(db.String(64), nullable=False, default=username)
     avatar = db.Column(db.String(32), default=app.config['DEFAULT_AVATAR_MD5'])
     status = db.Column(db.Text)
     birthday = db.Column(db.Date, default=date.today)
@@ -74,7 +74,7 @@ class User(db.Model):
     reserves = db.relationship('Reserve', backref='user', lazy='dynamic')
 
     @classmethod
-    def gettter(cls, id):
+    def getter(cls, id):
         return cls.query.filter_by(id=id).first()
 
     @classmethod
@@ -148,12 +148,12 @@ class Apartment(db.Model):
         backref=db.backref('apartments', lazy='dynamic'),
         lazy='dynamic',
     )
-    devices = db.relationship('Tag',
+    devices = db.relationship('Device',
         secondary=apartments_devices,
         backref=db.backref('apartments', lazy='dynamic'),
         lazy='dynamic',
     )
-    photos = db.relationship('Tag',
+    photos = db.relationship('Photo',
         secondary=apartments_photos,
         backref=db.backref('apartments', lazy='dynamic'),
         lazy='dynamic',
@@ -276,12 +276,17 @@ class Client(db.Model):
 
     @classmethod
     def setter(cls, name, type='public'):
-        client = cls(
+        client = cls.query.filter_by(
             name=name,
             type=type,
-        )
-        db.session.add(client)
-        db.session.commit()
+        ).first()
+        if not client:
+            client = cls(
+                name=name,
+                type=type,
+            )
+            db.session.add(client)
+            db.session.commit()
 
 
 class Token(db.Model):
