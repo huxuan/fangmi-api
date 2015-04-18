@@ -72,6 +72,10 @@ class User(db.Model):
     rents = db.relationship('Rent', backref='user', lazy='dynamic')
     reserves = db.relationship('Reserve', backref='user', lazy='dynamic')
 
+    @classmethod
+    def gettter(cls, id):
+        return cls.query.filter_by(id=id).first()
+
 
 class School(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -244,16 +248,22 @@ class Comment(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     deleted = db.Column(db.Boolean, default=False)
 
+
 class Client(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    name = db.Column(db.String(32), nullable=False, unique=False, index=True)
+    name = db.Column(db.String(32), nullable=False, unique=True, index=True)
     type = db.Column(db.String(32), default='public')
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     deleted = db.Column(db.Boolean, default=False)
 
     tokens = db.relationship('Token', backref='client', lazy='dynamic')
+
+    @classmethod
+    def getter(cls, name):
+        return cls.query.filter_by(name=name).first()
+
 
 class Token(db.Model):
     __table_args__ = (
@@ -271,3 +281,24 @@ class Token(db.Model):
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     deleted = db.Column(db.Boolean, default=False)
+
+    @classmethod
+    def getter(cls, access_token=None, refresh_token=None):
+        if access_token:
+            return cls.query.filter_by(access_token=access_token).first()
+        elif refresh_token:
+            return cls.query.filter_by(refresh_token=refresh_token).first()
+
+    @classmethod
+    def setter(cls, token, request, *args, **kwargs):
+        token = cls.query.filter_by(
+            user_id=request.user.id,
+            client_id=request.client.id,
+        ).first() or cls(
+            access_token=token['access_token'],
+            refresh_token=token['refresh_token'],
+            token_type=token['token_type'],
+        )
+
+        db.session.add(token)
+        db.session.commit()
