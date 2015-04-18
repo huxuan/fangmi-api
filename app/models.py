@@ -43,7 +43,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     # Authentication related.
-    mobile = db.Column(db.String(11), nullable=False, unique=True, index=True)
+    username = db.Column(db.String(11), nullable=False, unique=True, index=True)
     password = db.Column(db.String(32), nullable=False)
 
     # Online Profile.
@@ -56,6 +56,7 @@ class User(db.Model):
 
     # Personal Information.
     name = db.Column(db.String(16))
+    mobile = db.Column(db.String(11))
     id_number = db.Column(db.String(18))
     school = db.Column(db.String(32))
     major = db.Column(db.String(32))
