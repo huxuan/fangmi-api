@@ -1,3 +1,4 @@
 flask
+flask-oauthlib
 flask-sqlalchemy
-MySQL-python
+mysql-python
