@@ -15,3 +15,8 @@ app.config.from_object('config')
 db = SQLAlchemy(app)
 
 from app import models
+
+@app.route('/')
+@app.route('/test')
+def test():
+    return 'Hello world from {}!'.format(__name__)
