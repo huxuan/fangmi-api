@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 File: db_drop.py
-Author: Francis Chan
-Email: f1ancis621@gmail.com
-Description: script to drop all tables
+Author: huxuan
+Email: i(at)huxuan.org
+Description: Script to drop all tables
 """
 
 print 'Please input "fangmi" to confirm you know what you are doing'
