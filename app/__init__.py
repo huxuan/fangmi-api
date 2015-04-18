@@ -14,6 +14,10 @@ app.config.from_object('config')
 
 db = SQLAlchemy(app)
 
+from app.oauth import oauth
+
+app.register_blueprint(oauth, url_prefix='/oauth')
+
 from app import models
 
 @app.route('/')
