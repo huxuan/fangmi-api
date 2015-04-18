@@ -7,4 +7,9 @@ Email: i(at)huxuan.org
 Description: Run script for FangMi.
 """
 from app import app
-app.run()
+
+def main():
+    app.run()
+
+if __name__ == '__main__':
+    main()
