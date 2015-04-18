@@ -12,7 +12,8 @@ from flask import jsonify
 from flask_oauthlib.provider import OAuth2Provider
 from flask_oauthlib.provider import OAuth2RequestValidator
 
-from .. import models
+from .. import app
+from app import models
 
 oauth = Blueprint('oauth', __name__)
 
@@ -35,7 +36,7 @@ class PasswordCredentialRequestValidator(OAuth2RequestValidator):
         self._tokengetter = models.Token.getter
         self._tokensetter = models.Token.setter
 
-oauthlib = OAuth2Provider(oauth)
+oauthlib = OAuth2Provider(app)
 oauthlib._validator = PasswordCredentialRequestValidator()
 
 @oauth.route('/token', methods=['POST'])

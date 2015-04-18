@@ -8,9 +8,12 @@ Description: Models for FangMi API.
 """
 from datetime import date
 from datetime import datetime
+from datetime import timedelta
 
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.ext.declarative import ConcreteBase
+from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
 
 from app import app
 from app import db
@@ -40,11 +43,9 @@ apartments_photos = db.Table('apartments_photos',
 
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-
     # Authentication related.
-    username = db.Column(db.String(11), nullable=False, unique=True, index=True)
-    password = db.Column(db.String(32), nullable=False)
+    username = db.Column(db.String(32), primary_key=True)
+    password_hash = db.Column(db.String(128), nullable=False)
 
     # Online Profile.
     nickname = db.Column(db.String(64), nullable=False, default=username)
@@ -72,10 +73,25 @@ class User(db.Model):
     apartments = db.relationship('Apartment', backref='user', lazy='dynamic')
     rents = db.relationship('Rent', backref='user', lazy='dynamic')
     reserves = db.relationship('Reserve', backref='user', lazy='dynamic')
+    tokens = db.relationship('Token', backref='user', lazy='dynamic')
+
+    @property
+    def password(self):
+        raise AttributeError('password is not a readable attribute')
+
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
     @classmethod
-    def getter(cls, id):
-        return cls.query.filter_by(id=id).first()
+    def getter(cls, username, password=None, *args, **kwargs):
+        user = cls.query.filter_by(username=username).first()
+        if user and user.verify_password(password):
+            return user
+        return None
 
     @classmethod
     def setter(cls, username, password):
@@ -122,7 +138,7 @@ class Community(db.Model):
 class Apartment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    username = db.Column(db.String(32), db.ForeignKey('user.username'))
     community_id = db.Column(db.Integer, db.ForeignKey('community.id'))
 
     title = db.Column(db.String(64), nullable=False)
@@ -201,7 +217,7 @@ class Photo(db.Model):
 class Rent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    username = db.Column(db.String(32), db.ForeignKey('user.username'))
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
     dt_start = db.Column(db.DateTime)
     dt_end = db.Column(db.DateTime)
@@ -213,7 +229,7 @@ class Rent(db.Model):
 class Reserve(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    username = db.Column(db.String(32), db.ForeignKey('user.username'))
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
     dt = db.Column(db.DateTime)
     period = db.Column(db.SmallInteger)
@@ -227,8 +243,8 @@ class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     key = db.Column(db.String(64), nullable=False, index=True)
-    from_uid = db.Column(db.Integer, db.ForeignKey('user.id'))
-    to_uid = db.Column(db.Integer, db.ForeignKey('user.id'))
+    from_username = db.Column(db.String(32), db.ForeignKey('user.username'))
+    to_username = db.Column(db.String(32), db.ForeignKey('user.username'))
     type = db.Column(db.SmallInteger)
     content = db.Column(db.Text)
     unread = db.Column(db.Boolean, default=True)
@@ -250,7 +266,7 @@ class Captcha(db.Model):
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    username = db.Column(db.String(32), db.ForeignKey('user.username'))
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
     content = db.Column(db.Text)
     rate = db.Column(db.SmallInteger)
@@ -260,51 +276,60 @@ class Comment(db.Model):
 
 
 class Client(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-
-    name = db.Column(db.String(32), nullable=False, unique=True, index=True)
-    type = db.Column(db.String(32), default='public')
+    client_id = db.Column(db.String(64), primary_key=True)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     deleted = db.Column(db.Boolean, default=False)
 
     tokens = db.relationship('Token', backref='client', lazy='dynamic')
 
-    @classmethod
-    def getter(cls, name):
-        return cls.query.filter_by(name=name).first()
+    @property
+    def client_type(self):
+        return 'public'
+
+    @property
+    def default_redirect_uri(self):
+        return ''
+
+    @property
+    def default_scopes(self):
+        return []
+
+    @property
+    def allowed_grant_types(self):
+        return ['password']
 
     @classmethod
-    def setter(cls, name, type='public'):
-        client = cls.query.filter_by(
-            name=name,
-            type=type,
-        ).first()
+    def getter(cls, client_id):
+        return cls.query.filter_by(client_id=client_id).first()
+
+    @classmethod
+    def setter(cls, client_id):
+        client = cls.query.filter_by(client_id=client_id).first()
         if not client:
-            client = cls(
-                name=name,
-                type=type,
-            )
+            client = cls(client_id=client_id)
             db.session.add(client)
             db.session.commit()
 
 
 class Token(db.Model):
     __table_args__ = (
-        db.Index('ix_token_user_id_client_id', 'user_id', 'client_id'),
+        db.Index('ix_token_username_client_id', 'username', 'client_id'),
     )
 
     id = db.Column(db.Integer, primary_key=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    client_id = db.Column(db.Integer, db.ForeignKey('client.id'))
+    username = db.Column(db.String(32), db.ForeignKey('user.username'))
+    client_id = db.Column(db.String(64), db.ForeignKey('client.client_id'))
 
     access_token = db.Column(db.String(255), unique=True, index=True)
     refresh_token = db.Column(db.String(255), unique=True, index=True)
     token_type = db.Column(db.String(32))
+    expires = db.Column(db.DateTime)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    deleted = db.Column(db.Boolean, default=False)
+    @property
+    def scopes(self):
+        return []
 
     @classmethod
     def getter(cls, access_token=None, refresh_token=None):
@@ -315,14 +340,26 @@ class Token(db.Model):
 
     @classmethod
     def setter(cls, token, request, *args, **kwargs):
-        token = cls.query.filter_by(
-            user_id=request.user.id,
-            client_id=request.client.id,
-        ).first() or cls(
+        tokens = cls.query.filter_by(
+            username=request.user.username,
+            client_id=request.client.client_id,
+        )
+
+        for t in tokens:
+            db.session.delete(t)
+
+        expires_in = token.pop('expires_in')
+        expires = datetime.utcnow() + timedelta(seconds=expires_in)
+
+        token = cls(
             access_token=token['access_token'],
             refresh_token=token['refresh_token'],
             token_type=token['token_type'],
+            expires=expires,
+            client_id=request.client.client_id,
+            username=request.user.username,
         )
 
         db.session.add(token)
         db.session.commit()
+        return token
