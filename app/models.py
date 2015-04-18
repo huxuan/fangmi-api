@@ -77,6 +77,15 @@ class User(db.Model):
     def gettter(cls, id):
         return cls.query.filter_by(id=id).first()
 
+    @classmethod
+    def setter(cls, username, password):
+        user = cls(
+            username=username,
+            password=password,
+        )
+        db.session.add(user)
+        db.session.commit()
+
 
 class School(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -264,6 +273,15 @@ class Client(db.Model):
     @classmethod
     def getter(cls, name):
         return cls.query.filter_by(name=name).first()
+
+    @classmethod
+    def setter(cls, name, type='public'):
+        client = cls(
+            name=name,
+            type=type,
+        )
+        db.session.add(client)
+        db.session.commit()
 
 
 class Token(db.Model):
