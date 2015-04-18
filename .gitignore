@@ -58,3 +58,4 @@ target/
 
 # Custom
 config.py
+*.sw?
