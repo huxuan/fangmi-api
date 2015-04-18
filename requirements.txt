@@ -3,3 +3,4 @@ flask-oauthlib
 flask-restful
 flask-sqlalchemy
 mysql-python
+uwsgi
