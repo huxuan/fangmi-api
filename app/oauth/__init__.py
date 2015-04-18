@@ -9,13 +9,18 @@ Description: Init file for oauth blueprint.
 
 from flask import Blueprint
 from flask import jsonify
+from flask_oauthlib.provider import OAuth2Provider
 from flask_oauthlib.provider import OAuth2RequestValidator
 
 from .. import models
-from .. import oauth
 
 bp_oauth = Blueprint('oauth', __name__)
+oauth = OAuth2Provider()
 
+
+@bp_oauth.record_once
+def on_load(state):
+    oauth.init_app(state.app)
 
 class PasswordCredentialRequestValidator(OAuth2RequestValidator):
     """ A custom OAuth2 Request Validator based on the Client, User

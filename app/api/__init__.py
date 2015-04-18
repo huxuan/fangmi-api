@@ -12,9 +12,7 @@ from flask import Blueprint
 from flask import Flask
 from flask import jsonify
 
-from .. import api
 from .. import models
-from .. import oauth
 import code
 
 bp_api = Blueprint('api', __name__)
