@@ -223,7 +223,7 @@ class Message(db.Model):
     deleted = db.Column(db.Boolean, default=False)
 
 
-class Token(db.Model):
+class Captcha(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     mobile = db.Column(db.String(11), nullable=False, index=True)
@@ -240,6 +240,34 @@ class Comment(db.Model):
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
     content = db.Column(db.Text)
     rate = db.Column(db.SmallInteger)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    deleted = db.Column(db.Boolean, default=False)
+
+class Client(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.String(32), nullable=False, unique=False, index=True)
+    type = db.Column(db.String(32), default='public')
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    deleted = db.Column(db.Boolean, default=False)
+
+    tokens = db.relationship('Token', backref='client', lazy='dynamic')
+
+class Token(db.Model):
+    __table_args__ = (
+        db.Index('ix_token_user_id_client_id', 'user_id', 'client_id'),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    client_id = db.Column(db.Integer, db.ForeignKey('client.id'))
+
+    access_token = db.Column(db.String(255), unique=True, index=True)
+    refresh_token = db.Column(db.String(255), unique=True, index=True)
+    token_type = db.Column(db.String(32))
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     deleted = db.Column(db.Boolean, default=False)
