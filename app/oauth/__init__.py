@@ -30,7 +30,6 @@ class PasswordCredentialRequestValidator(OAuth2RequestValidator):
         :param OAuth2RequestValidator: Overrides the OAuth2RequestValidator.
     """
     def __init__(self):
-        pass
         self._clientgetter = models.Client.getter
         self._usergetter = models.User.getter
         self._tokengetter = models.Token.getter
