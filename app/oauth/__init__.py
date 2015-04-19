@@ -13,6 +13,7 @@ from flask_oauthlib.provider import OAuth2Provider
 from flask_oauthlib.provider import OAuth2RequestValidator
 
 from .. import models
+from .. import utils
 
 bp_oauth = Blueprint('oauth', __name__)
 oauth = OAuth2Provider()
@@ -48,7 +49,7 @@ def access_token():
 @bp_oauth.route('/me')
 @oauth.require_oauth()
 def me():
-    return jsonify(message="Logged In!")
+    return utils.api_response(payload={'status':'Logged In'})
 
 
 @bp_oauth.route('/')
