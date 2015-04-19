@@ -122,7 +122,10 @@ class User(db.Model):
         db.session.flush()
 
     def verify_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        if check_password_hash(self.password_hash, password):
+            return True
+        else:
+            raise utils.APIException(utils.API_CODE_PASSWORD_INVALID)
 
     def serialize(self):
         res = dict(
