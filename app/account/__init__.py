@@ -14,6 +14,7 @@ from flask.ext.restful import reqparse
 
 from .. import models
 from .. import utils
+from ..oauth import oauth
 
 account = Blueprint('account', __name__)
 api = Api(account)
@@ -53,5 +54,25 @@ class PasswordForgetAPI(Resource):
         return utils.api_response()
 
 
+class PasswordChangeAPI(Resource):
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('password_old', type=str, required=True)
+        self.parser.add_argument('password_new', type=str, required=True)
+        self.parser.add_argument('password_new_confirm', type=str,
+            required=True)
+
+    @oauth.require_oauth()
+    def post(self):
+        args = self.parser.parse_args(request)
+        utils.check_password_confirm(args['password_new'],
+            args['password_new_confirm'])
+        user = request.oauth.user
+        user.verify_password(args['password_old'])
+        user.change_password(args['password_new'])
+        return utils.api_response()
+
+
 api.add_resource(RegisterAPI, '/register')
 api.add_resource(PasswordForgetAPI, '/password/forget')
+api.add_resource(PasswordChangeAPI, '/password/change')
