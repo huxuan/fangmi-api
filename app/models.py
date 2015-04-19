@@ -87,14 +87,14 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
     @classmethod
-    def getter(cls, username, password=None, *args, **kwargs):
+    def getter(cls, username, password, *args, **kwargs):
         user = cls.query.filter_by(username=username).first()
         if user and user.verify_password(password):
             return user
         return None
 
     @classmethod
-    def setter(cls, username, password):
+    def create(cls, username, password):
         user = cls(
             username=username,
             password=password,

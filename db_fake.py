@@ -13,8 +13,8 @@ def fake_client():
     models.Client.setter('fangmi-web')
 
 def fake_user():
-    models.User.setter('u1', 'pwd1')
-    models.User.setter('u2', 'pwd2')
+    models.User.create('u1', 'pwd1')
+    models.User.create('u2', 'pwd2')
 
 def main():
     fake_client()
