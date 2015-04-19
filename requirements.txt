@@ -1,4 +1,5 @@
 flask
+flask-cors
 flask-oauthlib
 flask-restful
 flask-sqlalchemy

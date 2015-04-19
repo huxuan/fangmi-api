@@ -10,11 +10,13 @@ from functools import partial
 
 from flask import Flask
 from flask import jsonify
+from flask.ext.cors import CORS
 from flask.ext.sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config.from_object('config')
 
+cors = CORS(app)
 db = SQLAlchemy(app)
 
 from app import models
