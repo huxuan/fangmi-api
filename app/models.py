@@ -147,8 +147,6 @@ class User(db.Model):
         return res
 
 
-
-
 class School(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
@@ -315,9 +313,9 @@ class Captcha(db.Model):
             .first()
         if not captcha:
             raise utils.APIException(utils.API_CODE_CAPTCHA_NOT_FOUND)
-        if captcha['token'] != token:
+        if captcha.token != token:
             raise utils.APIException(utils.API_CODE_CAPTCHA_INVALID)
-        captcha['deleted'] = True
+        captcha.deleted = True
         db.session.flush()
 
 
