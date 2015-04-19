@@ -36,4 +36,22 @@ class RegisterAPI(Resource):
         return utils.api_response(payload=user.serialize())
 
 
+class PasswordForgetAPI(Resource):
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('username', type=str, required=True)
+        self.parser.add_argument('captcha', type=str, required=True)
+        self.parser.add_argument('password', type=str, required=True)
+        self.parser.add_argument('password_confirm', type=str, required=True)
+
+    def post(self):
+        args = self.parser.parse_args(request)
+        models.Captcha.verify(args['username'], args['captcha'])
+        utils.check_password_confirm(args['password'], args['password_confirm'])
+        user = models.User.get(args['username'])
+        user.change_password(args['password'])
+        return utils.api_response()
+
+
 api.add_resource(RegisterAPI, '/register')
+api.add_resource(PasswordForgetAPI, '/password/forget')

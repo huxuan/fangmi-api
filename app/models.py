@@ -85,11 +85,15 @@ class User(db.Model):
         self.password_hash = generate_password_hash(password)
 
     @classmethod
-    def get(cls, username, has_deleted=False):
+    def get(cls, username, filter_deleted=True):
         res = cls.query.filter_by(username=username)
-        if not has_deleted:
+        if filter_deleted:
             res = res.filter_by(deleted=False)
-        return res.first()
+        res = res.first()
+        if res:
+            return res
+        else:
+            raise utils.APIException(utils.API_CODE_USER_NOT_FOUND)
 
     @classmethod
     def getter(cls, username, password, *args, **kwargs):
@@ -112,6 +116,10 @@ class User(db.Model):
     def check_not_exist(cls, username):
         if cls.get(username):
             raise utils.APIException(utils.API_CODE_USER_EXIST)
+
+    def change_password(self, password):
+        self.password = password
+        db.session.flush()
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
