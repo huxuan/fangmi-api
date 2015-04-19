@@ -17,6 +17,7 @@ from werkzeug.security import generate_password_hash
 
 from app import app
 from app import db
+from app import utils
 
 schools_communities = db.Table('schools_communities',
     db.Column('school_id', db.Integer, db.ForeignKey('school.id')),
@@ -83,8 +84,12 @@ class User(db.Model):
     def password(self, password):
         self.password_hash = generate_password_hash(password)
 
-    def verify_password(self, password):
-        return check_password_hash(self.password_hash, password)
+    @classmethod
+    def get(cls, username, has_deleted=False):
+        res = cls.query.filter_by(username=username)
+        if not has_deleted:
+            res = res.filter_by(deleted=False)
+        return res.first()
 
     @classmethod
     def getter(cls, username, password, *args, **kwargs):
@@ -101,6 +106,47 @@ class User(db.Model):
         )
         db.session.add(user)
         db.session.commit()
+        return user
+
+    @classmethod
+    def check_not_exist(cls, username):
+        if cls.get(username):
+            raise utils.APIException(utils.API_CODE_USER_EXIST)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def serialize(self):
+        res = dict(
+            username=self.username,
+            nickname=self.nickname,
+            avatar=self.avatar,
+            status=self.status,
+            birthday=utils.convert_date(self.birthday),
+            horoscope=self.horoscope,
+            gender=self.gender,
+            mobile=self.mobile,
+            is_confirmed=self.is_confirmed,
+            is_student=self.is_student,
+            created_at=utils.convert_datetime(self.created_at),
+            deleted=self.deleted,
+        )
+        if self.is_student:
+            res.update(dict(
+                school=self.school,
+                major=self.major,
+                student_id=self.student_id,
+                pic_student=self.pic_student,
+                pic_portal=self.pic_portal,
+            ))
+        if self.is_confirmed:
+            res.update(dict(
+                name=self.name,
+                id_number=self.id_number,
+            ))
+        return res
+
+
 
 
 class School(db.Model):
@@ -261,6 +307,18 @@ class Captcha(db.Model):
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     deleted = db.Column(db.Boolean, default=False)
+
+    @classmethod
+    def verify(cls, mobile, token):
+        return True # NOTE(huxuan): Hack verify() until captcha feature is done.
+        captcha = cls.query.filter_by(mobile=mobile).filter_by(deleted=False)\
+            .first()
+        if not captcha:
+            raise utils.APIException(utils.API_CODE_CAPTCHA_NOT_FOUND)
+        if captcha['token'] != token:
+            raise utils.APIException(utils.API_CODE_CAPTCHA_INVALID)
+        captcha['deleted'] = True
+        db.session.flush()
 
 
 class Comment(db.Model):

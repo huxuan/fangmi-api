@@ -20,9 +20,11 @@ db = SQLAlchemy(app)
 from app import models
 from app import utils
 
+from app.account import account
 from app.api import bp_api
 from app.oauth import bp_oauth
 
+app.register_blueprint(account, url_prefix='/api/account')
 app.register_blueprint(bp_api, url_prefix='/api')
 app.register_blueprint(bp_oauth, url_prefix='/oauth')
 
