@@ -26,3 +26,8 @@ SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
 # The md5 for default avatar.
 DEFAULT_AVATAR_MD5 = 'DEFAULT_AVATAR_MD5'
+
+# Data/Time format we use.
+DATE_FORMAT = '%Y-%m-%d'
+TIME_FORMAT = '%H:%M:%S'
+DATETIME_FORMAT = ' '.join([DATE_FORMAT, TIME_FORMAT])
