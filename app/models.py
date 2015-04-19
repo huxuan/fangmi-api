@@ -43,6 +43,11 @@ apartments_photos = db.Table('apartments_photos',
 )
 
 
+users_fav_apartments = db.Table('users_fav_apartments',
+    db.Column('username', db.String(32), db.ForeignKey('user.username')),
+    db.Column('apartment_id', db.Integer, db.ForeignKey('apartment.id')),
+)
+
 class User(db.Model):
     # Authentication related.
     username = db.Column(db.String(32), primary_key=True)
@@ -76,6 +81,12 @@ class User(db.Model):
     reserves = db.relationship('Reserve', backref='user', lazy='dynamic')
     tokens = db.relationship('Token', backref='user', lazy='dynamic')
 
+    fav_apartments = db.relationship('Apartment',
+        secondary=users_fav_apartments,
+        backref=db.backref('users', lazy='dynamic'),
+        lazy='dynamic',
+    )
+
     @property
     def password(self):
         raise AttributeError('password is not a readable attribute')
@@ -83,6 +94,18 @@ class User(db.Model):
     @password.setter
     def password(self, password):
         self.password_hash = generate_password_hash(password)
+
+    @property
+    def num_fav_apartments(self):
+        return self.fav_apartments.count()
+
+    @property
+    def num_unread_messages(self):
+        return Message.query.filter(
+            Message.to_username==self.username,
+            Message.unread==True,
+            Message.deleted==False,
+        ).count()
 
     @classmethod
     def get(cls, username, filter_deleted=True):
@@ -137,6 +160,8 @@ class User(db.Model):
             horoscope=self.horoscope,
             gender=self.gender,
             mobile=self.mobile,
+            num_fav_apartments=self.num_fav_apartments,
+            num_unread_messages=self.num_unread_messages,
             is_confirmed=self.is_confirmed,
             is_student=self.is_student,
             created_at=utils.convert_datetime(self.created_at),
@@ -295,6 +320,11 @@ class Reserve(db.Model):
 
 
 class Message(db.Model):
+    __table_args__ = (
+        db.Index('ix_message_to_username_unread_deleted',
+            'to_username', 'unread', 'deleted'),
+    )
+
     id = db.Column(db.Integer, primary_key=True)
 
     key = db.Column(db.String(64), nullable=False, index=True)
