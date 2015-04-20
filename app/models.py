@@ -55,7 +55,7 @@ class User(db.Model):
 
     # Online Profile.
     nickname = db.Column(db.String(64), nullable=False, default=username)
-    avatar = db.Column(db.String(32), default=app.config['DEFAULT_AVATAR_MD5'])
+    avatar_md5 = db.Column(db.String(32), default=app.config['DEFAULT_AVATAR_MD5'])
     status = db.Column(db.Text)
     birthday = db.Column(db.Date, default=date.today)
     horoscope = db.Column(db.SmallInteger)
@@ -94,6 +94,16 @@ class User(db.Model):
     @password.setter
     def password(self, password):
         self.password_hash = generate_password_hash(password)
+
+    @property
+    def avatar(self):
+        return utils.get_url_from_md5(app.config['UPLOAD_AVATAR_URL'],
+            self.avatar_md5)
+
+    @avatar.setter
+    def avatar(self, stream):
+        self.avatar_md5 = utils.save_file(stream,
+            app.config['UPLOAD_AVATAR_FOLDER'])
 
     @property
     def num_fav_apartments(self):
