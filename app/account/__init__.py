@@ -10,6 +10,7 @@ from flask import Blueprint
 from flask import request
 from flask.ext.restful import Api
 from flask.ext.restful import Resource
+from flask.ext.restful import inputs
 from flask.ext.restful import reqparse
 
 from .. import models
@@ -18,6 +19,28 @@ from ..oauth import oauth
 
 account = Blueprint('account', __name__)
 api = Api(account)
+
+
+class AccountAPI(Resource):
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('nickname', default=None)
+        self.parser.add_argument('gender', type=inputs.boolean, default=None)
+        self.parser.add_argument('horoscope', type=int, choices=range(12),
+            default=None)
+        self.parser.add_argument('status', default=None)
+
+    @oauth.require_oauth()
+    def get(self):
+        user = request.oauth.user
+        return utils.api_response(payload=user.serialize())
+
+    @oauth.require_oauth()
+    def post(self):
+        args = self.parser.parse_args(request)
+        user = request.oauth.user
+        user.update(**args)
+        return utils.api_response(payload=user.serialize())
 
 
 class RegisterAPI(Resource):
@@ -72,6 +95,7 @@ class PasswordChangeAPI(Resource):
         return utils.api_response()
 
 
+api.add_resource(AccountAPI, '')
 api.add_resource(RegisterAPI, '/register')
 api.add_resource(PasswordForgetAPI, '/password/forget')
 api.add_resource(PasswordChangeAPI, '/password/change')

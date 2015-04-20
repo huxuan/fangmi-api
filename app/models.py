@@ -149,6 +149,11 @@ class User(db.Model):
         else:
             raise utils.APIException(utils.API_CODE_PASSWORD_INVALID)
 
+    def update(self, **kwargs):
+        for key in kwargs:
+            if kwargs[key] is not None:
+                setattr(self, key, kwargs[key])
+
     def serialize(self):
         res = dict(
             username=self.username,
