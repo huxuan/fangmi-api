@@ -59,3 +59,4 @@ target/
 # Custom
 config.py
 *.sw?
+uploads/
