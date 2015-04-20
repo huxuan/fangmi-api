@@ -31,4 +31,19 @@ class UserAPI(Resource):
         return utils.api_response(payload=user.serialize())
 
 
+class UserListAPI(Resource):
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('username', action='append', default=[])
+
+    def get(self):
+        args = self.parser.parse_args(request)
+        payload = dict(
+            users=[models.User.get(username).serialize()
+                for username in args['username']]
+        )
+        return utils.api_response(payload=payload)
+
+
 api.add_resource(UserAPI, '')
+api.add_resource(UserListAPI, '/list')
