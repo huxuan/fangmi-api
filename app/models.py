@@ -73,7 +73,7 @@ class User(db.Model):
     is_confirmed = db.Column(db.Boolean, default=False)
     is_student = db.Column(db.Boolean, default=False)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
     apartments = db.relationship('Apartment', backref='user', lazy='dynamic')
@@ -189,7 +189,7 @@ class School(db.Model):
     avatar = db.Column(db.String(32))
     image = db.Column(db.String(32))
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
     communities = db.relationship('Community',
@@ -207,7 +207,7 @@ class Community(db.Model):
     traffic = db.Column(db.Text)
     pic_map = db.Column(db.String(32))
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
     apartments = db.relationship('Apartment', backref='community',
@@ -232,7 +232,7 @@ class Apartment(db.Model):
     pic_contract = db.Column(db.String(32))
     status = db.Column(db.SmallInteger)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
     rooms = db.relationship('Room', backref='apartment', lazy='dynamic')
@@ -262,7 +262,7 @@ class Room(db.Model):
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
     time_entrance = db.Column(db.Date, nullable=True)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
 
@@ -271,7 +271,7 @@ class Tag(db.Model):
 
     name = db.Column(db.String(64), nullable=False, unique=True, index=True)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
 
@@ -280,7 +280,7 @@ class Device(db.Model):
 
     name = db.Column(db.String(64), nullable=False, unique=True, index=True)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
 
@@ -289,7 +289,7 @@ class Photo(db.Model):
 
     md5 = db.Column(db.String(32), nullable=False, unique=True)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
 
@@ -301,7 +301,7 @@ class Rent(db.Model):
     dt_start = db.Column(db.DateTime)
     dt_end = db.Column(db.DateTime)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
 
@@ -314,7 +314,7 @@ class Reserve(db.Model):
     period = db.Column(db.SmallInteger)
     cancelled = db.Column(db.SmallInteger)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
 
@@ -333,7 +333,7 @@ class Message(db.Model):
     content = db.Column(db.Text)
     unread = db.Column(db.Boolean, default=True)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
 
@@ -343,7 +343,7 @@ class Captcha(db.Model):
     mobile = db.Column(db.String(11), nullable=False, index=True)
     token = db.Column(db.String(6), nullable=False, index=True)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
     @classmethod
@@ -367,14 +367,14 @@ class Comment(db.Model):
     content = db.Column(db.Text)
     rate = db.Column(db.SmallInteger)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
 
 class Client(db.Model):
     client_id = db.Column(db.String(64), primary_key=True)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
     tokens = db.relationship('Token', backref='client', lazy='dynamic')
@@ -445,7 +445,7 @@ class Token(db.Model):
             db.session.delete(t)
 
         expires_in = token.pop('expires_in')
-        expires = datetime.utcnow() + timedelta(seconds=expires_in)
+        expires = datetime.now() + timedelta(seconds=expires_in)
 
         token = cls(
             access_token=token['access_token'],
