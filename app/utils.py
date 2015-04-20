@@ -6,6 +6,11 @@ Author: huxuan
 Email: i(at)huxuan.org
 Description: Shared library for FangMi.
 """
+from shutil import copyfileobj
+import cStringIO as StringIO
+import hashlib
+import os
+
 from flask import jsonify
 
 from app import app
@@ -70,3 +75,37 @@ def convert_time(time):
 
 def convert_datetime(datetime):
     return datetime.strftime(app.config['DATETIME_FORMAT'])
+
+
+def get_stringio_and_md5_from_stream(stream):
+    hasher = hashlib.md5()
+    stringio = StringIO.StringIO()
+    buf = stream.read(app.config['BLOCKSIZE'])
+    while len(buf) > 0:
+        hasher.update(buf)
+        stringio.write(buf)
+        buf = stream.read(app.config['BLOCKSIZE'])
+    stringio.seek(0)
+    return stringio, hasher.hexdigest()
+
+
+def get_path_from_md5(folder, file_md5):
+    file_path = '/'.join([file_md5[:2], file_md5[2:4], file_md5[4:]])
+    file_path = os.path.join(folder, file_path)
+    return os.path.realpath(file_path)
+
+
+def get_url_from_md5(folder, file_md5):
+    return '/'.join(['', folder, file_md5[:2], file_md5[2:4], file_md5[4:]])
+
+
+def save_file(stream, folder):
+    file_stringio, file_md5 = get_stringio_and_md5_from_stream(stream)
+    file_path = get_path_from_md5(folder, file_md5)
+    dir_path = os.path.dirname(file_path)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    if not os.path.isfile(file_path):
+        with open(file_path, 'wb') as fout:
+            copyfileobj(file_stringio, fout, app.config['BLOCKSIZE'])
+    return file_md5
