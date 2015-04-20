@@ -23,10 +23,10 @@ api = Api(account)
 class RegisterAPI(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('username', type=str, required=True)
-        self.parser.add_argument('password', type=str, required=True)
-        self.parser.add_argument('password_confirm', type=str, default='')
-        self.parser.add_argument('captcha', type=str, required=True)
+        self.parser.add_argument('username', required=True)
+        self.parser.add_argument('password', required=True)
+        self.parser.add_argument('password_confirm', default='')
+        self.parser.add_argument('captcha', required=True)
 
     def post(self):
         args = self.parser.parse_args(request)
@@ -40,10 +40,10 @@ class RegisterAPI(Resource):
 class PasswordForgetAPI(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('username', type=str, required=True)
-        self.parser.add_argument('captcha', type=str, required=True)
-        self.parser.add_argument('password', type=str, required=True)
-        self.parser.add_argument('password_confirm', type=str, required=True)
+        self.parser.add_argument('username', required=True)
+        self.parser.add_argument('captcha', required=True)
+        self.parser.add_argument('password', required=True)
+        self.parser.add_argument('password_confirm', required=True)
 
     def post(self):
         args = self.parser.parse_args(request)
@@ -57,10 +57,9 @@ class PasswordForgetAPI(Resource):
 class PasswordChangeAPI(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('password_old', type=str, required=True)
-        self.parser.add_argument('password_new', type=str, required=True)
-        self.parser.add_argument('password_new_confirm', type=str,
-            required=True)
+        self.parser.add_argument('password_old', required=True)
+        self.parser.add_argument('password_new', required=True)
+        self.parser.add_argument('password_new_confirm', required=True)
 
     @oauth.require_oauth()
     def post(self):
