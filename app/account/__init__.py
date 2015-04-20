@@ -12,6 +12,7 @@ from flask.ext.restful import Api
 from flask.ext.restful import Resource
 from flask.ext.restful import inputs
 from flask.ext.restful import reqparse
+from werkzeug import datastructures
 
 from .. import models
 from .. import utils
@@ -29,6 +30,10 @@ class AccountAPI(Resource):
         self.parser.add_argument('horoscope', type=int, choices=range(12),
             default=None)
         self.parser.add_argument('status', default=None)
+        self.parser.add_argument('avatar',
+            type=datastructures.FileStorage,
+            location='files',
+        )
 
     @oauth.require_oauth()
     def get(self):
