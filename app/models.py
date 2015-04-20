@@ -108,15 +108,14 @@ class User(db.Model):
         ).count()
 
     @classmethod
-    def get(cls, username, filter_deleted=True):
+    def get(cls, username, filter_deleted=True, nullable=False):
         res = cls.query.filter_by(username=username)
         if filter_deleted:
             res = res.filter_by(deleted=False)
         res = res.first()
-        if res:
-            return res
-        else:
+        if not nullable and not res:
             raise utils.APIException(utils.API_CODE_USER_NOT_FOUND)
+        return res
 
     @classmethod
     def getter(cls, username, password, *args, **kwargs):
@@ -137,7 +136,7 @@ class User(db.Model):
 
     @classmethod
     def check_not_exist(cls, username):
-        if cls.get(username):
+        if cls.get(username, nullable=True):
             raise utils.APIException(utils.API_CODE_USER_EXIST)
 
     def change_password(self, password):
