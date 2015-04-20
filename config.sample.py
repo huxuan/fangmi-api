@@ -6,6 +6,8 @@ Author: huxuan
 Email: i(at)huxuan.org
 Description: Configuration file for FangMi.
 """
+import os
+
 # Debug or not
 DEBUG = True
 
@@ -31,3 +33,19 @@ DEFAULT_AVATAR_MD5 = 'DEFAULT_AVATAR_MD5'
 DATE_FORMAT = '%Y-%m-%d'
 TIME_FORMAT = '%H:%M:%S'
 DATETIME_FORMAT = ' '.join([DATE_FORMAT, TIME_FORMAT])
+
+# The maximun block size we read every time when processing file.
+BLOCKSIZE = 65536
+# The directory to store uploaded files.
+UPLOAD_DIR = 'uploads'
+UPLOAD_URL = UPLOAD_DIR
+UPLOAD_FOLDER = os.path.realpath(os.path.join(
+    os.path.dirname(__file__),
+    UPLOAD_DIR,
+))
+UPLOAD_AVATAR_DIR = 'avatars'
+UPLOAD_AVATAR_URL = os.path.join(UPLOAD_URL, UPLOAD_AVATAR_DIR)
+UPLOAD_AVATAR_FOLDER = os.path.realpath(os.path.join(
+    UPLOAD_FOLDER,
+    UPLOAD_AVATAR_DIR,
+))
