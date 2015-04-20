@@ -25,10 +25,12 @@ from app import utils
 from app.account import account
 from app.api import bp_api
 from app.oauth import bp_oauth
+from app.uploads import uploads
 
 app.register_blueprint(account, url_prefix='/api/account')
 app.register_blueprint(bp_api, url_prefix='/api')
 app.register_blueprint(bp_oauth, url_prefix='/oauth')
+app.register_blueprint(uploads, url_prefix='/uploads')
 
 # NOTE(huxuan): Use Flask's error handler instead of the one in flask-restful.
 app.handle_exception = partial(Flask.handle_exception, app)
