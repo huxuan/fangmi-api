@@ -213,6 +213,20 @@ class School(db.Model):
         lazy='dynamic',
     )
 
+    @classmethod
+    def get(cls, id=None, name=None, filter_deleted=True, nullable=False):
+        res = cls.query
+        if id:
+            res = res.filter_by(id=id)
+        if name:
+            res = res.filter_by(name=name)
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        res = res.first()
+        if not nullable and not res:
+            raise utils.APIException(utils.API_CODE_SCHOOL_NOT_FOUND)
+        return res
+
 
 class Community(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -228,6 +242,19 @@ class Community(db.Model):
     apartments = db.relationship('Apartment', backref='community',
         lazy='dynamic')
 
+    @classmethod
+    def get(cls, id=None, name=None, filter_deleted=True, nullable=False):
+        res = cls.query
+        if id:
+            res = res.filter_by(id=id)
+        if name:
+            res = res.filter_by(name=name)
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        res = res.first()
+        if not nullable and not res:
+            raise utils.APIException(utils.API_CODE_COMMUNITY_NOT_FOUND)
+        return res
 
 class Apartment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
