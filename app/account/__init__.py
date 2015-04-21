@@ -44,7 +44,7 @@ class AccountAPI(Resource):
     def post(self):
         args = self.parser.parse_args(request)
         user = request.oauth.user
-        user.update(**args)
+        user.set(**args)
         return utils.api_response(payload=user.serialize())
 
 
