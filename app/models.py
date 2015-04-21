@@ -68,18 +68,19 @@ class User(db.Model):
     school = db.Column(db.String(32))
     major = db.Column(db.String(32))
     student_id = db.Column(db.String(32))
-    pic_student = db.Column(db.String(32))
-    pic_portal = db.Column(db.String(32))
+    pic_student_md5 = db.Column(db.String(32))
+    pic_portal_md5 = db.Column(db.String(32))
     is_confirmed = db.Column(db.Boolean, default=False)
     is_student = db.Column(db.Boolean, default=False)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
-    apartments = db.relationship('Apartment', backref='user', lazy='dynamic')
-    rents = db.relationship('Rent', backref='user', lazy='dynamic')
-    reserves = db.relationship('Reserve', backref='user', lazy='dynamic')
-    tokens = db.relationship('Token', backref='user', lazy='dynamic')
+    apartment_list = db.relationship('Apartment', backref='user', lazy='dynamic')
+    rent_list = db.relationship('Rent', backref='user', lazy='dynamic')
+    reserve_list = db.relationship('Reserve', backref='user', lazy='dynamic')
+    comment_list = db.relationship('Comment', backref='user', lazy='dynamic')
+    token_list = db.relationship('Token', backref='user', lazy='dynamic')
 
     fav_apartments = db.relationship('Apartment',
         secondary=users_fav_apartments,
@@ -106,6 +107,26 @@ class User(db.Model):
             app.config['UPLOAD_AVATAR_FOLDER'])
 
     @property
+    def pic_student(self):
+        return utils.get_url_from_md5(app.config['UPLOAD_PIC_STUDENT_URL'],
+            self.pic_student_md5)
+
+    @pic_student.setter
+    def pic_student(self, stream):
+        self.pic_student_md5 = utils.save_file(stream,
+            app.config['UPLOAD_PIC_STUDENT_FOLDER'])
+
+    @property
+    def pic_portal(self):
+        return utils.get_url_from_md5(app.config['UPLOAD_PIC_PORTAL_URL'],
+            self.pic_portal_md5)
+
+    @pic_portal.setter
+    def pic_portal(self, stream):
+        self.pic_portal_md5 = utils.save_file(stream,
+            app.config['UPLOAD_PIC_PORTAL_FOLDER'])
+
+    @property
     def num_fav_apartments(self):
         return self.fav_apartments.count()
 
@@ -116,16 +137,6 @@ class User(db.Model):
             Message.unread==True,
             Message.deleted==False,
         ).count()
-
-    @classmethod
-    def get(cls, username, filter_deleted=True, nullable=False):
-        res = cls.query.filter_by(username=username)
-        if filter_deleted:
-            res = res.filter_by(deleted=False)
-        res = res.first()
-        if not nullable and not res:
-            raise utils.APIException(utils.API_CODE_USER_NOT_FOUND)
-        return res
 
     @classmethod
     def getter(cls, username, password, *args, **kwargs):
@@ -145,9 +156,26 @@ class User(db.Model):
         return user
 
     @classmethod
+    def get(cls, username, filter_deleted=True, nullable=False):
+        res = cls.get_query.filter_by(username=username)
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        res = res.first()
+        if not nullable and not res:
+            raise utils.APIException(utils.API_CODE_USER_NOT_FOUND)
+        return res
+
+    @classmethod
     def check_not_exist(cls, username):
         if cls.get(username, nullable=True):
-            raise utils.APIException(utils.API_CODE_USER_EXIST)
+            raise utils.APIException(utils.API_CODE_USER_DUPLICATE)
+        return True
+
+    def set(self, **kwargs):
+        for key in kwargs:
+            if kwargs[key] is not None:
+                setattr(self, key, kwargs[key])
+        db.session.flush()
 
     def change_password(self, password):
         self.password = password
@@ -158,11 +186,6 @@ class User(db.Model):
             return True
         else:
             raise utils.APIException(utils.API_CODE_PASSWORD_INVALID)
-
-    def update(self, **kwargs):
-        for key in kwargs:
-            if kwargs[key] is not None:
-                setattr(self, key, kwargs[key])
 
     def serialize(self):
         res = dict(
