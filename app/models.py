@@ -224,8 +224,8 @@ class School(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(32), nullable=False, unique=True, index=True)
-    avatar = db.Column(db.String(32))
-    image = db.Column(db.String(32))
+    avatar_md5 = db.Column(db.String(32))
+    image_md5 = db.Column(db.String(32))
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
@@ -236,19 +236,62 @@ class School(db.Model):
         lazy='dynamic',
     )
 
+    @property
+    def avatar(self):
+        return utils.get_url_from_md5(app.config['UPLOAD_SCHOOL_AVATAR_URL'],
+            self.avatar_md5)
+
+    @avatar.setter
+    def avatar(self, stream):
+        self.avatar_md5 = utils.save_file(stream,
+            app.config['UPLOAD_SCHOOL_AVATAR_FOLDER'])
+
+    @property
+    def image(self):
+        return utils.get_url_from_md5(app.config['UPLOAD_SCHOOL_IMAGE_URL'],
+            self.image_md5)
+
+    @image.setter
+    def image(self, stream):
+        self.image_md5 = utils.save_file(stream,
+            app.config['UPLOAD_SCHOOL_IMAGE_FOLDER'])
+
     @classmethod
-    def get(cls, id=None, name=None, filter_deleted=True, nullable=False):
-        res = cls.query
-        if id:
-            res = res.filter_by(id=id)
-        if name:
-            res = res.filter_by(name=name)
+    def create(cls, name, avatar, image):
+        school = cls(
+            name=name,
+            avatar=avatar,
+            image=image,
+        )
+        db.session.add(school)
+        db.session.commit()
+        return school
+
+    @classmethod
+    def get(cls, name, filter_deleted=True, nullable=False):
+        res = cls.query.filter_by(name=name)
         if filter_deleted:
             res = res.filter_by(deleted=False)
         res = res.first()
         if not nullable and not res:
             raise utils.APIException(utils.API_CODE_SCHOOL_NOT_FOUND)
         return res
+
+    def set(self, **kwargs):
+        for key in kwargs:
+            if kwargs[key] is not None:
+                setattr(self, key, kwargs[key])
+        db.session.flush()
+
+    def serialize(self):
+        return dict(
+            id=self.id,
+            name=self.name,
+            avatar=self.avatar,
+            image=self.image,
+            created_at=utils.convert_datetime(self.created_at),
+            deleted=self.deleted,
+        )
 
 
 class Community(db.Model):
