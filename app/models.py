@@ -298,9 +298,9 @@ class Community(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(32), nullable=False, unique=True, index=True)
-    add = db.Column(db.Text)
-    traffic = db.Column(db.Text)
-    pic_map = db.Column(db.String(32))
+    address = db.Column(db.String(255))
+    traffic = db.Column(db.String(255))
+    map_md5 = db.Column(db.String(32))
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
@@ -308,19 +308,55 @@ class Community(db.Model):
     apartments = db.relationship('Apartment', backref='community',
         lazy='dynamic')
 
+    @property
+    def map(self):
+        return utils.get_url_from_md5(app.config['UPLOAD_COMMUNITY_MAP_URL'],
+            self.map_md5)
+
+    @map.setter
+    def map(self, stream):
+        self.map_md5 = utils.save_file(stream,
+            app.config['UPLOAD_COMMUNITY_MAP_FOLDER'])
+
     @classmethod
-    def get(cls, id=None, name=None, filter_deleted=True, nullable=False):
-        res = cls.query
-        if id:
-            res = res.filter_by(id=id)
-        if name:
-            res = res.filter_by(name=name)
+    def create(cls, name, address, traffic, map):
+        community = cls(
+            name=name,
+            address=address,
+            traffic=traffic,
+            map=map,
+        )
+        db.session.add(community)
+        db.session.commit()
+        return community
+
+    @classmethod
+    def get(cls, name, filter_deleted=True, nullable=False):
+        res = cls.query.filter_by(name=name)
         if filter_deleted:
             res = res.filter_by(deleted=False)
         res = res.first()
         if not nullable and not res:
             raise utils.APIException(utils.API_CODE_COMMUNITY_NOT_FOUND)
         return res
+
+    def set(self, **kwargs):
+        for key in kwargs:
+            if kwargs[key] is not None:
+                setattr(self, key, kwargs[key])
+        db.session.flush()
+
+    def serialize(self):
+        return dict(
+            id=self.id,
+            name=self.name,
+            address=self.address,
+            traffic=self.traffic,
+            map=self.map,
+            created_at=utils.convert_datetime(self.created_at),
+            deleted=self.deleted,
+        )
+
 
 class Apartment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
