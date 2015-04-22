@@ -72,7 +72,7 @@ class User(db.Model):
     comment_list = db.relationship('Comment', backref='user', lazy='dynamic')
     token_list = db.relationship('Token', backref='user', lazy='dynamic')
 
-    fav_apartments = db.relationship('Apartment',
+    fav_apartment_list = db.relationship('Apartment',
         secondary=users_fav_apartments,
         backref=db.backref('users', lazy='dynamic'),
         lazy='dynamic',
@@ -127,6 +127,10 @@ class User(db.Model):
             Message.unread==True,
             Message.deleted==False,
         ).count()
+
+    @property
+    def fav_apartments(self):
+        return [apartment.serialize() for apartment in self.fav_apartment_list]
 
     @classmethod
     def getter(cls, username, password, *args, **kwargs):
@@ -191,6 +195,7 @@ class User(db.Model):
             num_unread_messages=self.num_unread_messages,
             is_confirmed=self.is_confirmed,
             is_student=self.is_student,
+            fav_apartments=self.fav_apartments,
             created_at=utils.convert_datetime(self.created_at),
             deleted=self.deleted,
         )
@@ -220,9 +225,9 @@ class School(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
-    communities = db.relationship('Community',
+    community_list = db.relationship('Community',
         secondary=schools_communities,
-        backref=db.backref('schools', lazy='dynamic'),
+        backref=db.backref('school_list', lazy='dynamic'),
         lazy='dynamic',
     )
 
@@ -245,6 +250,21 @@ class School(db.Model):
     def image(self, stream):
         self.image_md5 = utils.save_file(stream,
             app.config['UPLOAD_SCHOOL_IMAGE_FOLDER'])
+
+    @property
+    def communities(self):
+        return [community.serialize() for community in self.community_list]
+
+    @communities.setter
+    def communities(self, communities):
+        for community in communities:
+            community_item = Community.create(
+                community['name'],
+                community['address'],
+                community['traffic'],
+                community['map'],
+            )
+            self.community_list.append(community_item)
 
     @classmethod
     def create(cls, name, avatar, image):
@@ -279,6 +299,7 @@ class School(db.Model):
             name=self.name,
             avatar=self.avatar,
             image=self.image,
+            communities=self.communities,
             created_at=utils.convert_datetime(self.created_at),
             deleted=self.deleted,
         )
@@ -295,7 +316,7 @@ class Community(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
-    apartments = db.relationship('Apartment', backref='community',
+    apartment_list = db.relationship('Apartment', backref='community',
         lazy='dynamic')
 
     @property
@@ -307,6 +328,24 @@ class Community(db.Model):
     def map(self, stream):
         self.map_md5 = utils.save_file(stream,
             app.config['UPLOAD_COMMUNITY_MAP_FOLDER'])
+
+    @property
+    def schools(self):
+        return [school.serialize() for school in self.school_list]
+
+    @schools.setter
+    def schools(self, schools):
+        for school in schools:
+            school_item = School.create(
+                school['name'],
+                school['avatar'],
+                school['image'],
+            )
+            self.school_list.append(school_item)
+
+    @property
+    def apartments(self):
+        return [apartment.serialize() for apartment in self.apartment_list]
 
     @classmethod
     def create(cls, name, address, traffic, map):
@@ -343,6 +382,8 @@ class Community(db.Model):
             address=self.address,
             traffic=self.traffic,
             map=self.map,
+            schools=self.schools,
+            apartments=self.apartments,
             created_at=utils.convert_datetime(self.created_at),
             deleted=self.deleted,
         )
@@ -379,7 +420,7 @@ class Apartment(db.Model):
 
     tag_list = db.relationship('Tag',
         secondary=apartments_tags,
-        backref=db.backref('apartments', lazy='dynamic'),
+        backref=db.backref('apartment_list', lazy='dynamic'),
         lazy='dynamic',
     )
 
@@ -794,6 +835,10 @@ class Tag(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
+    @property
+    def apartments(self):
+        return [apartment.serialize() for apartment in self.apartment_list]
+
     @classmethod
     def get(cls, name):
         return cls.query.filter_by(name=name).first()
@@ -819,6 +864,7 @@ class Tag(db.Model):
         return dict(
             id=self.id,
             name=self.name,
+            apartments=self.apartments,
             created_at=utils.convert_datetime(self.created_at),
             deleted=self.deleted,
         )
