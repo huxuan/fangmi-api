@@ -118,7 +118,7 @@ class User(db.Model):
 
     @property
     def num_fav_apartments(self):
-        return self.fav_apartments.count()
+        return self.fav_apartment_list.count()
 
     @property
     def num_unread_messages(self):
@@ -258,13 +258,8 @@ class School(db.Model):
     @communities.setter
     def communities(self, communities):
         for community in communities:
-            community_item = Community.create(
-                community['name'],
-                community['address'],
-                community['traffic'],
-                community['map'],
-            )
-            self.community_list.append(community_item)
+            self.community_list.append(community)
+        db.session.commit()
 
     @classmethod
     def create(cls, name, avatar, image):
@@ -336,12 +331,8 @@ class Community(db.Model):
     @schools.setter
     def schools(self, schools):
         for school in schools:
-            school_item = School.create(
-                school['name'],
-                school['avatar'],
-                school['image'],
-            )
-            self.school_list.append(school_item)
+            self.school_list.append(school)
+        db.session.commit()
 
     @property
     def apartments(self):
@@ -464,6 +455,7 @@ class Apartment(db.Model):
                 comment['rate'],
             )
             self.comment_list.append(comment_item)
+        db.session.commit()
 
     @property
     def devices(self):
@@ -478,6 +470,7 @@ class Apartment(db.Model):
                 device['count'],
             )
             self.device_list.append(device_item)
+        db.session.commit()
 
     @property
     def photos(self):
@@ -491,6 +484,7 @@ class Apartment(db.Model):
                 photo,
             )
             self.photo_list.append(photo_item)
+        db.session.commit()
 
     @property
     def rents(self):
@@ -506,6 +500,7 @@ class Apartment(db.Model):
                 rent['dt_end'],
             )
             self.rent_list.append(rent_item)
+        db.session.commit()
 
     @property
     def reserve_choices(self):
@@ -521,6 +516,7 @@ class Apartment(db.Model):
                 reserve_choice['period'],
             )
             self.reserve_choice_list.append(reserve_choice_item)
+        db.session.commit()
 
     @property
     def reserves(self):
@@ -536,6 +532,7 @@ class Apartment(db.Model):
                 reserve['period'],
             )
             self.reserve_list.append(reserve_item)
+        db.session.commit()
 
     @property
     def rooms(self):
@@ -552,6 +549,7 @@ class Apartment(db.Model):
                 room['time_entrance'],
             )
             self.room_list.append(room_item)
+        db.session.commit()
 
     @property
     def tags(self):
@@ -564,6 +562,7 @@ class Apartment(db.Model):
                 tag['name'],
             )
             self.tag_list.append(tag_item)
+        db.session.commit()
 
     @classmethod
     def create(cls, user, community, title="", subtitle="", address="",
