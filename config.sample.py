@@ -79,3 +79,15 @@ UPLOAD_COMMUNITY_MAP_FOLDER = os.path.realpath(os.path.join(
     UPLOAD_FOLDER,
     UPLOAD_COMMUNITY_MAP_DIR,
 ))
+UPLOAD_CONTRACT_DIR = 'contracts'
+UPLOAD_CONTRACT_URL = os.path.join(UPLOAD_URL, UPLOAD_CONTRACT_DIR)
+UPLOAD_CONTRACT_FOLDER = os.path.realpath(os.path.join(
+    UPLOAD_FOLDER,
+    UPLOAD_CONTRACT_DIR,
+))
+UPLOAD_PHOTO_DIR = 'photos'
+UPLOAD_PHOTO_URL = os.path.join(UPLOAD_URL, UPLOAD_PHOTO_DIR)
+UPLOAD_PHOTO_FOLDER = os.path.realpath(os.path.join(
+    UPLOAD_FOLDER,
+    UPLOAD_PHOTO_DIR,
+))
