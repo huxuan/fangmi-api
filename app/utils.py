@@ -16,15 +16,18 @@ from flask import jsonify
 from app import app
 
 API_CODE_OK = 200
-
-API_CODE_CAPTCHA_INVALID = 1001
-API_CODE_CAPTCHA_NOT_FOUND = 1002
-API_CODE_COMMUNITY_NOT_FOUND = 2001
-API_CODE_PASSWORD_CONFIRM_INVALID = 3001
-API_CODE_PASSWORD_INVALID = 3002
-API_CODE_SCHOOL_NOT_FOUND = 4001
-API_CODE_USER_DUPLICATE = 5001
-API_CODE_USER_NOT_FOUND = 5002
+API_CODE_APARTMENT_NOT_FOUND = 1001
+API_CODE_CAPTCHA_INVALID = 2001
+API_CODE_CAPTCHA_NOT_FOUND = 2002
+API_CODE_COMMUNITY_NOT_FOUND = 3001
+API_CODE_MESSAGE_NOT_FOUND = 4001
+API_CODE_PASSWORD_CONFIRM_INVALID = 5001
+API_CODE_PASSWORD_INVALID = 5002
+API_CODE_RENT_NOT_FOUND = 6001
+API_CODE_RESERVE_NOT_FOUND = 7001
+API_CODE_SCHOOL_NOT_FOUND = 8001
+API_CODE_USER_DUPLICATE = 9001
+API_CODE_USER_NOT_FOUND = 9002
 
 API_CODE_MESSAGE = {
     API_CODE_OK: u'OK',
@@ -34,8 +37,12 @@ API_CODE_MESSAGE = {
     API_CODE_PASSWORD_CONFIRM_INVALID: u'确认密码不一致。',
     API_CODE_PASSWORD_INVALID: u'密码错误。',
     API_CODE_SCHOOL_NOT_FOUND: u'学校不存在。',
-    API_CODE_USER_EXIST: u'用户已存在。',
+    API_CODE_USER_DUPLICATE: u'用户已存在。',
     API_CODE_USER_NOT_FOUND: u'用户不存在。',
+    API_CODE_RENT_NOT_FOUND: u'租房记录不存在。',
+    API_CODE_RESERVE_NOT_FOUND: '预约记录不存在。',
+    API_CODE_MESSAGE_NOT_FOUND: '消息不存在。',
+    API_CODE_APARTMENT_NOT_FOUND: '房屋不存在。',
 }
 
 class APIResponse():
@@ -105,12 +112,15 @@ def get_url_from_md5(folder, file_md5):
 
 
 def save_file(stream, folder):
-    file_stringio, file_md5 = get_stringio_and_md5_from_stream(stream)
-    file_path = get_path_from_md5(folder, file_md5)
-    dir_path = os.path.dirname(file_path)
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
-    if not os.path.isfile(file_path):
-        with open(file_path, 'wb') as fout:
-            copyfileobj(file_stringio, fout, app.config['BLOCKSIZE'])
-    return file_md5
+    if stream:
+        file_stringio, file_md5 = get_stringio_and_md5_from_stream(stream)
+        file_path = get_path_from_md5(folder, file_md5)
+        dir_path = os.path.dirname(file_path)
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+        if not os.path.isfile(file_path):
+            with open(file_path, 'wb') as fout:
+                copyfileobj(file_stringio, fout, app.config['BLOCKSIZE'])
+        return file_md5
+    else:
+        return ""

@@ -10,6 +10,7 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 
+from sqlalchemy import and_
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.ext.declarative import ConcreteBase
 from werkzeug.security import check_password_hash
@@ -31,22 +32,11 @@ apartments_tags = db.Table('apartments_tags',
 )
 
 
-apartments_devices = db.Table('apartments_devices',
-    db.Column('apartment_id', db.Integer, db.ForeignKey('apartment.id')),
-    db.Column('device_id', db.Integer, db.ForeignKey('device.id')),
-)
-
-
-apartments_photos = db.Table('apartments_photos',
-    db.Column('apartment_id', db.Integer, db.ForeignKey('apartment.id')),
-    db.Column('photo_id', db.Integer, db.ForeignKey('photo.id')),
-)
-
-
 users_fav_apartments = db.Table('users_fav_apartments',
     db.Column('username', db.String(32), db.ForeignKey('user.username')),
     db.Column('apartment_id', db.Integer, db.ForeignKey('apartment.id')),
 )
+
 
 class User(db.Model):
     # Authentication related.
@@ -157,7 +147,7 @@ class User(db.Model):
 
     @classmethod
     def get(cls, username, filter_deleted=True, nullable=False):
-        res = cls.get_query.filter_by(username=username)
+        res = cls.query.filter_by(username=username)
         if filter_deleted:
             res = res.filter_by(deleted=False)
         res = res.first()
@@ -366,48 +356,434 @@ class Apartment(db.Model):
 
     title = db.Column(db.String(64), nullable=False)
     subtitle = db.Column(db.String(64))
-
+    address = db.Column(db.String(64))
+    contract_md5 = db.Column(db.String(32))
+    num_bathroom = db.Column(db.SmallInteger)
     num_bedroom = db.Column(db.SmallInteger)
     num_livingroom = db.Column(db.SmallInteger)
-    num_bathroom = db.Column(db.SmallInteger)
-    price = db.Column(db.Integer)
-    area = db.Column(db.Integer)
-    type = db.Column(db.SmallInteger)
-    pic_contract = db.Column(db.String(32))
     status = db.Column(db.SmallInteger)
+    type = db.Column(db.SmallInteger)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
-    rooms = db.relationship('Room', backref='apartment', lazy='dynamic')
-    comments = db.relationship('Comment', backref='apartment', lazy='dynamic')
+    comment_list = db.relationship('Comment', backref='apartment',
+        lazy='dynamic')
+    device_list = db.relationship('Device', backref='apartment', lazy='dynamic')
+    photo_list = db.relationship('Photo', backref='apartment', lazy='dynamic')
+    rent_list = db.relationship('Rent', backref='apartment', lazy='dynamic')
+    reserve_choice_list = db.relationship('ReserveChoice', backref='apartment',
+        lazy='dynamic')
+    reserve_list = db.relationship('Reserve', backref='apartment', lazy='dynamic')
+    room_list = db.relationship('Room', backref='apartment', lazy='dynamic')
 
-    tags = db.relationship('Tag',
+    tag_list = db.relationship('Tag',
         secondary=apartments_tags,
         backref=db.backref('apartments', lazy='dynamic'),
         lazy='dynamic',
     )
-    devices = db.relationship('Device',
-        secondary=apartments_devices,
-        backref=db.backref('apartments', lazy='dynamic'),
-        lazy='dynamic',
-    )
-    photos = db.relationship('Photo',
-        secondary=apartments_photos,
-        backref=db.backref('apartments', lazy='dynamic'),
-        lazy='dynamic',
-    )
+
+    @property
+    def user(self):
+        return self.user.serialize()
+
+    @user.setter
+    def user(self, user):
+        self.username = user.username
+
+    @property
+    def community(self):
+        return self.community.serialize()
+
+    @community.setter
+    def community(self, community):
+        self.community_id = community.id
+
+    @property
+    def contract(self):
+        return utils.get_url_from_md5(app.config['UPLOAD_CONTRACT_URL'],
+            self.contract_md5)
+
+    @contract.setter
+    def contract(self, stream):
+        self.contract_md5 = utils.save_file(stream,
+            app.config['UPLOAD_CONTRACT_FOLDER'])
+
+    @property
+    def comments(self):
+        return [comment.serialize() for comment in self.comment_list]
+
+    @comments.setter
+    def comments(self, comments):
+        for comment in comments:
+            comment_item = Comment.create(
+                comment['username'],
+                self.id,
+                comment['content'],
+                comment['rate'],
+            )
+            self.comment_list.append(comment_item)
+
+    @property
+    def devices(self):
+        return [device.serialize() for device in self.device_list]
+
+    @devices.setter
+    def devices(self, devices):
+        for device in devices:
+            device_item = Device.create(
+                self.id,
+                device['name'],
+                device['count'],
+            )
+            self.device_list.append(device_item)
+
+    @property
+    def photos(self):
+        return [photo.serialize() for device in self.device_list]
+
+    @photos.setter
+    def photos(self, photos):
+        for photo in photos:
+            photo_item = Photo.create(
+                self.id,
+                photo,
+            )
+            self.photo_list.append(photo_item)
+
+    @property
+    def rents(self):
+        return [rent.serialize() for rent in self.rent_list]
+
+    @rents.setter
+    def rents(self, rents):
+        for rent in rents:
+            rent_item = Rent.create(
+                rent['username'],
+                self.id,
+                rent['dt_start'],
+                rent['dt_end'],
+            )
+            self.rent_list.append(rent_item)
+
+    @property
+    def reserve_choices(self):
+        return [reserve_choice.serialize()
+            for reserve_choice in self.reserve_choice_list]
+
+    @reserve_choices.setter
+    def reserve_choices(self, reserve_choices):
+        for reserve_choice in reserve_choices:
+            reserve_choice_item = ReserveChoice.create(
+                self.id,
+                reserve_choice['date'],
+                reserve_choice['period'],
+            )
+            self.reserve_choice_list.append(reserve_choice_item)
+
+    @property
+    def reserves(self):
+        return [reserve.serialize() for reserve in self.reserve_list]
+
+    @reserves.setter
+    def reserves(self, reserves):
+        for reserve in reserves:
+            reserve_item = Reserve.create(
+                reserve['username'],
+                self.id,
+                reserve['date'],
+                reserve['period'],
+            )
+            self.reserve_list.append(reserve_item)
+
+    @property
+    def rooms(self):
+        return [room.serialize() for room in self.room_list]
+
+    @rooms.setter
+    def rooms(self, rooms):
+        for room in rooms:
+            room_item = Room.create(
+                self.id,
+                room['area'],
+                room['name'],
+                room['price'],
+                room['time_entrance'],
+            )
+            self.room_list.append(room_item)
+
+    @property
+    def tags(self):
+        return [tag.serialize() for tag in self.tag_list]
+
+    @tags.setter
+    def tags(self, tags):
+        for tag in tags:
+            tag_item = Tag.create(
+                tag['name'],
+            )
+            self.tag_list.append(tag_item)
+
+    @classmethod
+    def create(cls, user, community, title="", subtitle="", address="",
+        contract=None, num_bathroom=0, num_bedroom=0, num_livingroom=0,
+        status=0, type=0, comments=[], devices=[], photos=[], rents=[],
+        reserve_choices=[], reserves=[], rooms=[], tags=[]):
+        apartment = cls(
+            user=user,
+            community=community,
+            title=title,
+            subtitle=subtitle,
+            address=address,
+            contract=contract,
+            num_bathroom=num_bathroom,
+            num_bedroom=num_bedroom,
+            num_livingroom=num_livingroom,
+            status=status,
+            type=type,
+            comments=comments,
+            devices=devices,
+            photos=photos,
+            rents=rents,
+            reserve_choices=reserve_choices,
+            reserves=reserves,
+            rooms=rooms,
+            tags=tags,
+        )
+        db.session.add(apartment)
+        db.session.commit()
+        return apartment
+
+    @classmethod
+    def get(cls, id, filter_deleted=True, nullable=False):
+        res = cls.query.filter_by(id=id)
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        res = res.first()
+        if not nullable and not res:
+            raise utils.APIException(utils.API_CODE_APARTMENT_NOT_FOUND)
+
+    @classmethod
+    def gets(cls, username=None, community_id=None, filter_deleted=True):
+        res = cls.query
+        if username:
+            res = res.filter_by(username=username)
+        if community_id:
+            res = res.filter_by(community_id=community_id)
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        res = res.all()
+        return res
+
+    def serialize(self):
+        res = dict(
+            id=self.id,
+            user=self.user,
+            community=self.community,
+            title=self.title,
+            subtitle=self.subtitle,
+            address=self.address,
+            contract=self.contract,
+            num_bathroom=self.num_bathroom,
+            num_bedroom=self.num_bedroom,
+            num_livingroom=self.num_livingroom,
+            status=self.status,
+            type=self.type,
+            comments=self.comments,
+            devices=self.devices,
+            photos=self.photos,
+            rents=self.rents,
+            reserve_choices=self.reserve_choices,
+            reserves=self.reserves,
+            rooms=self.rooms,
+            created_at=utils.convert_datetime(self.created_at),
+            deleted=self.deleted,
+        )
+
+
+class ReserveChoice(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
+
+    date = db.Column(db.Date)
+    period = db.Column(db.Integer)
+
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    deleted = db.Column(db.Boolean, default=False)
+
+    @property
+    def apartment(self):
+        return self.apartment.serialize()
+
+    @classmethod
+    def create(cls, apartment_id, date, period):
+        reserve_choice = cls(
+            apartment_id=apartment_id,
+            date=date,
+            period=period,
+        )
+        db.session.add(reserve_choice)
+        db.session.commit()
+        return reserve_choice
+
+    def set(self, **kwargs):
+        for key in kwargs:
+            if kwargs[key] is not None:
+                setattr(self, key, kwargs[key])
+        db.session.flush()
+
+    def serialize(self):
+        return dict(
+            id=self.id,
+            apartment=self.apartment,
+            date=self.date,
+            period=self.period,
+            created_at=utils.convert_datetime(self.created_at),
+            deleted=self.deleted,
+        )
 
 
 class Room(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    name = db.Column(db.String(16), nullable=False)
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
-    time_entrance = db.Column(db.Date, nullable=True)
+
+    area = db.Column(db.Integer)
+    name = db.Column(db.String(16), nullable=False)
+    price = db.Column(db.Integer)
+    time_entrance = db.Column(db.Date)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
+
+    @property
+    def apartment(self):
+        return self.apartment.serialize()
+
+    @classmethod
+    def create(cls, apartment_id, name, area, price, time_entrance):
+        room = cls(
+            apartment_id=apartment_id,
+            name=name,
+            area=area,
+            price=price,
+            time_entrance=time_entrance,
+        )
+        db.session.add(room)
+        db.session.commit()
+        return room
+
+    def set(self, **kwargs):
+        for key in kwargs:
+            if kwargs[key] is not None:
+                setattr(self, key, kwargs[key])
+        db.session.flush()
+
+    def serialize(self):
+        return dict(
+            id=self.id,
+            apartment=self.apartment,
+            area=self.area,
+            name=self.name,
+            price=self.price,
+            time_entrance=self.time_entrance,
+            created_at=utils.convert_datetime(self.created_at),
+            deleted=self.deleted,
+        )
+
+
+class Device(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
+
+    name = db.Column(db.String(64), nullable=False, unique=True, index=True)
+    count = db.Column(db.Integer)
+
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    deleted = db.Column(db.Boolean, default=False)
+
+    @property
+    def apartment(self):
+        return self.apartment.serialize()
+
+    @classmethod
+    def create(cls, name, price, time_entrance):
+        room = cls(
+            apartment_id=apartment_id,
+            name=name,
+            count=count,
+        )
+        db.session.add(room)
+        db.session.commit()
+        return room
+
+    def set(self, **kwargs):
+        for key in kwargs:
+            if kwargs[key] is not None:
+                setattr(self, key, kwargs[key])
+        db.session.flush()
+
+    def serialize(self):
+        return dict(
+            id=self.id,
+            apartment=self.apartment,
+            name=self.name,
+            count=self.count,
+            created_at=utils.convert_datetime(self.created_at),
+            deleted=self.deleted,
+        )
+
+
+class Photo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
+
+    photo_md5 = db.Column(db.String(32), nullable=False, unique=True)
+
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    deleted = db.Column(db.Boolean, default=False)
+
+    @property
+    def apartment(self):
+        return self.apartment.serialize()
+
+    @property
+    def photo(self):
+        return utils.get_url_from_md5(app.config['UPLOAD_PHOTO_URL'],
+            self.photo_md5)
+
+    @photo.setter
+    def photo(self, stream):
+        self.photo_md5 = utils.save_file(stream,
+            app.config['UPLOAD_PHOTO_FOLDER'])
+
+    @classmethod
+    def create(cls, apartment_id, photo):
+        photo = cls(
+            apartment_id=apartment_id,
+            photo=photo,
+        )
+        db.session.add(photo)
+        db.session.commit()
+        return photo
+
+    def set(self, **kwargs):
+        for key in kwargs:
+            if kwargs[key] is not None:
+                setattr(self, key, kwargs[key])
+        db.session.flush()
+
+    def serialize(self):
+        return dict(
+            id=self.id,
+            apartment=self.apartment,
+            photo=self.photo,
+            created_at=utils.convert_datetime(self.created_at),
+            deleted=self.deleted,
+        )
 
 
 class Tag(db.Model):
@@ -418,53 +794,204 @@ class Tag(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
+    @classmethod
+    def get(cls, name):
+        return cls.query.filter_by(name=name).first()
 
-class Device(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    @classmethod
+    def create(cls, name):
+        tag = cls.get(name)
+        if not tag:
+            tag = cls(
+                name=name,
+            )
+            db.session.add(tag)
+            db.session.commit()
+        return tag
 
-    name = db.Column(db.String(64), nullable=False, unique=True, index=True)
+    def set(self, **kwargs):
+        for key in kwargs:
+            if kwargs[key] is not None:
+                setattr(self, key, kwargs[key])
+        db.session.flush()
 
-    created_at = db.Column(db.DateTime, default=datetime.now)
-    deleted = db.Column(db.Boolean, default=False)
-
-
-class Photo(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-
-    md5 = db.Column(db.String(32), nullable=False, unique=True)
-
-    created_at = db.Column(db.DateTime, default=datetime.now)
-    deleted = db.Column(db.Boolean, default=False)
+    def serialize(self):
+        return dict(
+            id=self.id,
+            name=self.name,
+            created_at=utils.convert_datetime(self.created_at),
+            deleted=self.deleted,
+        )
 
 
 class Rent(db.Model):
+    __table_args__ = (
+        db.Index('ix_rent_username_apartment_id', 'username', 'apartment_id'),
+        db.Index('ix_rent_username_apartment_id_deleted', 'username',
+            'apartment_id', 'deleted'),
+        db.Index('ix_rent_apartment_id_deleted', 'apartment_id', 'deleted'),
+        db.Index('ix_rent_username_deleted', 'username', 'deleted'),
+    )
+
     id = db.Column(db.Integer, primary_key=True)
 
     username = db.Column(db.String(32), db.ForeignKey('user.username'))
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
+
     dt_start = db.Column(db.DateTime)
     dt_end = db.Column(db.DateTime)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
+    @property
+    def user(self):
+        return self.user.serialize()
+
+    @property
+    def apartment(self):
+        return self.apartment.serialize()
+
+    @classmethod
+    def create(cls, username, apartment_id, dt_start, dt_end):
+        rent = cls(
+            username=username,
+            apartment_id=apartment_id,
+            dt_start=dt_start,
+            dt_end=dt_end,
+        )
+        db.session.add(rent)
+        db.session.commit()
+        return rent
+
+    @classmethod
+    def get(cls, id, filter_deleted=True, nullable=False):
+        res = cls.query.filter_by(id=id)
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        res = res.first()
+        if not nullable and not res:
+            raise utils.APIException(utils.API_CODE_RENT_NOT_FOUND)
+        return res
+
+    @classmethod
+    def gets(cls, username=None, apartment_id=None, filter_deleted=True):
+        res = cls.query
+        if username:
+            res = res.filter_by(username=username)
+        if apartment_id:
+            res = res.filter_by(apartment_id=apartment_id)
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        return res.all()
+
+    def set(self, **kwargs):
+        for key in kwargs:
+            if kwargs[key] is not None:
+                setattr(self, key, kwargs[key])
+        db.session.flush()
+
+    def serialize(self):
+        return dict(
+            id=self.id,
+            user=self.user,
+            apartment=self.apartment,
+            dt_start=seld.dt_start,
+            dt_end=self.dt_end,
+            created_at=utils.convert_datetime(self.created_at),
+            deleted=self.deleted,
+        )
+
 
 class Reserve(db.Model):
+    __table_args__ = (
+        db.Index('ix_reserve_username_apartment_id', 'username',
+            'apartment_id'),
+        db.Index('ix_reserve_username_apartment_id_deleted', 'username',
+            'apartment_id', 'deleted'),
+        db.Index('ix_reserve_apartment_id_deleted', 'apartment_id', 'deleted'),
+        db.Index('ix_reserve_username_deleted', 'username', 'deleted'),
+    )
+
     id = db.Column(db.Integer, primary_key=True)
 
     username = db.Column(db.String(32), db.ForeignKey('user.username'))
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
+
     dt = db.Column(db.DateTime)
     period = db.Column(db.SmallInteger)
-    cancelled = db.Column(db.SmallInteger)
+    cancelled = db.Column(db.Boolean, default=False)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
+    @property
+    def user(self):
+        return self.user.serialize()
+
+    @property
+    def apartment(self):
+        return self.apartment.serialize()
+
+    @classmethod
+    def create(cls, username, apartment_id, dt, period):
+        reserve = cls(
+            username=username,
+            apartment_id=apartment_id,
+            dt=dt,
+            period=period,
+        )
+        db.session.add(reserve)
+        db.session.commit()
+        return reserve
+
+    @classmethod
+    def get(cls, id, filter_deleted=True, nullable=False):
+        res = cls.query.filter_by(id=id)
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        res = res.first()
+        if not nullable and not res:
+            raise utils.APIException(utils.API_CODE_RESERVE_NOT_FOUND)
+        return res
+
+    @classmethod
+    def gets(cls, username=None, apartment_id=None, filter_deleted=True):
+        res = cls.query
+        if username:
+            res = res.filter_by(username=username)
+        if apartment_id:
+            res = res.filter_by(apartment_id=apartment_id)
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        res = res.all()
+        return res
+
+    def set(self, **kwargs):
+        for key in kwargs:
+            if kwargs[key] is not None:
+                setattr(self, key, kwargs[key])
+        db.session.flush()
+
+    def serialize(self, has_user=False, has_apartment=False):
+        return dict(
+            id=self.id,
+            user=self.user,
+            apartment=self.apartment,
+            dt=seld.dt,
+            period=self.period,
+            image=self.image,
+            created_at=utils.convert_datetime(self.created_at),
+            deleted=self.deleted,
+        )
+
 
 class Message(db.Model):
     __table_args__ = (
-        db.Index('ix_message_to_username_unread_deleted',
+        db.Index('ix_message_key_deleted', 'key', 'deleted'),
+        db.Index('ix_message_key_to_username_unread', 'key', 'to_username',
+            'unread'),
+        db.Index('ix_message_key_to_username_unread_deleted', 'key',
             'to_username', 'unread', 'deleted'),
     )
 
@@ -473,6 +1000,7 @@ class Message(db.Model):
     key = db.Column(db.String(64), nullable=False, index=True)
     from_username = db.Column(db.String(32), db.ForeignKey('user.username'))
     to_username = db.Column(db.String(32), db.ForeignKey('user.username'))
+
     type = db.Column(db.SmallInteger)
     content = db.Column(db.Text)
     unread = db.Column(db.Boolean, default=True)
@@ -480,6 +1008,76 @@ class Message(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
+    @property
+    def from_user(self):
+        return User.get(from_username).serialize()
+
+    @property
+    def to_user(self):
+        return User.get(to_username).serialize()
+
+    @classmethod
+    def mark_as_read(cls, messages, username):
+        for message in messages:
+            if message.to_username == username:
+                message.unread=False
+        db.session.flush()
+
+    @classmethod
+    def create(cls, from_username, to_username, type, content, unread):
+        message = cls(
+            key='_'.join(sorted([from_username, to_username])),
+            from_username=from_username,
+            to_username=to_username,
+            type=type,
+        )
+        message.content = content
+        db.session.add(message)
+        db.session.commit()
+        return message
+
+    @classmethod
+    def get(cls, id, filter_deleted=True, nullable=False):
+        res = cls.query.filter_by(id=id)
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        res = res.first()
+        if not nullable and not res:
+            raise utils.APIException(utils.API_CODE_MESSAGE_NOT_FOUND)
+
+
+    @classmethod
+    def gets(cls, username, from_username, filter_unread=True,
+        filter_deleted=True):
+        key='_'.join(sorted([username, from_username])),
+        res = cls.query.filter_by(key=key)
+        if filter_unread:
+            res = res.filter(and_(
+                Message.to_username == username,
+                Message.unread == True,
+            ))
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        res = res.all()
+        cls.mark_as_read(res, username)
+        return res
+
+    def set(self, **kwargs):
+        for key in kwargs:
+            if kwargs[key] is not None:
+                setattr(self, key, kwargs[key])
+        db.session.flush()
+
+    def serialize(self):
+        return dict(
+            id=self.id,
+            from_user=self.from_user,
+            to_user=self.to_user,
+            content=self.content,
+            type=self.type,
+            created_at=utils.convert_datetime(self.created_at),
+            deleted=self.deleted,
+        )
 
 class Captcha(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -508,12 +1106,70 @@ class Comment(db.Model):
 
     username = db.Column(db.String(32), db.ForeignKey('user.username'))
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
+
     content = db.Column(db.Text)
     rate = db.Column(db.SmallInteger)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
+    @property
+    def user(self):
+        return self.user.serialize()
+
+    @property
+    def apartment(self):
+        return self.apartment.serialize()
+
+    @classmethod
+    def create(cls, username, apartment_id, content, rate):
+        rent = cls(
+            username=username,
+            apartment_id=apartment_id,
+            content=content,
+            rate=rate,
+        )
+        db.session.add(rent)
+        db.session.commit()
+        return rent
+
+    @classmethod
+    def get(cls, id, filter_deleted=True, nullable=False):
+        res = cls.query.filter_by(id=id)
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        res = res.first()
+        if not nullable and not res:
+            raise utils.APIException(utils.API_CODE_RENT_NOT_FOUND)
+        return res
+
+    @classmethod
+    def gets(cls, username=None, apartment_id=None, filter_deleted=True):
+        res = cls.query
+        if username:
+            res = res.filter_by(username=username)
+        if apartment_id:
+            res = res.filter_by(apartment_id=apartment_id)
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        return res.all()
+
+    def set(self, **kwargs):
+        for key in kwargs:
+            if kwargs[key] is not None:
+                setattr(self, key, kwargs[key])
+        db.session.flush()
+
+    def serialize(self):
+        return dict(
+            id=self.id,
+            user=self.user,
+            apartment=self.apartment,
+            content=seld.content,
+            rate=self.rate,
+            created_at=utils.convert_datetime(self.created_at),
+            deleted=self.deleted,
+        )
 
 class Client(db.Model):
     client_id = db.Column(db.String(64), primary_key=True)
