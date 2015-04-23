@@ -39,6 +39,9 @@ class PasswordCredentialRequestValidator(OAuth2RequestValidator):
 
 oauth._validator = PasswordCredentialRequestValidator()
 
+@oauth.invalid_response
+def invalid_require_oauth(request):
+    raise utils.APIException(utils.API_CODE_USER_NOT_AUTHORIZED)
 
 @bp_oauth.route('/token', methods=['POST'])
 @oauth.token_handler
@@ -49,7 +52,7 @@ def access_token():
 @bp_oauth.route('/me')
 @oauth.require_oauth()
 def me():
-    return utils.api_response(payload={'status':'Logged In'})
+    return utils.api_response(payload={u'status': u'登录成功！'})
 
 
 @bp_oauth.route('/')
