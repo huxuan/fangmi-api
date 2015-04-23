@@ -23,12 +23,14 @@ from app import models
 from app import utils
 
 from app.account import account
+from app.apartment import apartment
 from app.api import bp_api
 from app.oauth import bp_oauth
 from app.uploads import uploads
 from app.user import user
 
 app.register_blueprint(account, url_prefix='/api/account')
+app.register_blueprint(apartment, url_prefix='/api/apartment')
 app.register_blueprint(bp_api, url_prefix='/api')
 app.register_blueprint(bp_oauth, url_prefix='/oauth')
 app.register_blueprint(uploads, url_prefix='/uploads')
