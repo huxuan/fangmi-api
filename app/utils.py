@@ -77,16 +77,34 @@ def check_password_confirm(password, password_confirm):
         raise APIException(API_CODE_PASSWORD_CONFIRM_INVALID)
 
 
-def convert_date(date):
-    return date.strftime(app.config['DATE_FORMAT'])
+def strfdate(d):
+    """ Convert from datetime.date object to string. """
+    return d.strftime(app.config['DATE_FORMAT'])
 
 
-def convert_time(time):
-    return time.strftime(app.config['TIME_FORMAT'])
+def strftime(t):
+    """ Convert from datetime.time object to string. """
+    return t.strftime(app.config['TIME_FORMAT'])
 
 
-def convert_datetime(datetime):
-    return datetime.strftime(app.config['DATETIME_FORMAT'])
+def strfdatetime(dt):
+    """ Convert from datetime.datetime object to string. """
+    return dt.strftime(app.config['DATETIME_FORMAT'])
+
+
+def strpdate(d):
+    """ Convert from string to datetime.date object. """
+    return datetime.strptime(d, app.config['DATE_FORMAT']).date()
+
+
+def strptime(t):
+    """ Convert from string to datetime.time object. """
+    return time.strptime(t, app.config['TIME_FORMAT']).time()
+
+
+def strpdatetime(dt):
+    """ Convert from string to datetime.datetime object. """
+    return datetime.strptime(dt, app.config['DATETIME_FORMAT'])
 
 
 def get_stringio_and_md5_from_stream(stream):

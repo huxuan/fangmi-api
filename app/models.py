@@ -187,7 +187,7 @@ class User(db.Model):
             nickname=self.nickname,
             avatar=self.avatar,
             status=self.status,
-            birthday=utils.convert_date(self.birthday),
+            birthday=utils.strfdate(self.birthday),
             horoscope=self.horoscope,
             gender=self.gender,
             mobile=self.mobile,
@@ -196,7 +196,7 @@ class User(db.Model):
             is_confirmed=self.is_confirmed,
             is_student=self.is_student,
             fav_apartments=self.fav_apartments,
-            created_at=utils.convert_datetime(self.created_at),
+            created_at=utils.strfdatetime(self.created_at),
             deleted=self.deleted,
         )
         if self.is_student:
@@ -295,7 +295,7 @@ class School(db.Model):
             avatar=self.avatar,
             image=self.image,
             communities=self.communities,
-            created_at=utils.convert_datetime(self.created_at),
+            created_at=utils.strfdatetime(self.created_at),
             deleted=self.deleted,
         )
 
@@ -375,7 +375,7 @@ class Community(db.Model):
             map=self.map,
             schools=self.schools,
             apartments=self.apartments,
-            created_at=utils.convert_datetime(self.created_at),
+            created_at=utils.strfdatetime(self.created_at),
             deleted=self.deleted,
         )
 
@@ -636,7 +636,7 @@ class Apartment(db.Model):
             reserve_choices=self.reserve_choices,
             reserves=self.reserves,
             rooms=self.rooms,
-            created_at=utils.convert_datetime(self.created_at),
+            created_at=utils.strfdatetime(self.created_at),
             deleted=self.deleted,
         )
 
@@ -677,9 +677,10 @@ class ReserveChoice(db.Model):
         return dict(
             id=self.id,
             apartment=self.apartment,
-            date=self.date,
-            period=self.period,
-            created_at=utils.convert_datetime(self.created_at),
+            date=utils.strfdate(self.date),
+            dt_start=utils.strftime(self.dt_start),
+            dt_end=utils.strftime(self.dt_end),
+            created_at=utils.strfdatetime(self.created_at),
             deleted=self.deleted,
         )
 
@@ -728,7 +729,7 @@ class Room(db.Model):
             name=self.name,
             price=self.price,
             time_entrance=self.time_entrance,
-            created_at=utils.convert_datetime(self.created_at),
+            created_at=utils.strfdatetime(self.created_at),
             deleted=self.deleted,
         )
 
@@ -771,7 +772,7 @@ class Device(db.Model):
             apartment=self.apartment,
             name=self.name,
             count=self.count,
-            created_at=utils.convert_datetime(self.created_at),
+            created_at=utils.strfdatetime(self.created_at),
             deleted=self.deleted,
         )
 
@@ -821,7 +822,7 @@ class Photo(db.Model):
             id=self.id,
             apartment=self.apartment,
             photo=self.photo,
-            created_at=utils.convert_datetime(self.created_at),
+            created_at=utils.strfdatetime(self.created_at),
             deleted=self.deleted,
         )
 
@@ -864,7 +865,7 @@ class Tag(db.Model):
             id=self.id,
             name=self.name,
             apartments=self.apartments,
-            created_at=utils.convert_datetime(self.created_at),
+            created_at=utils.strfdatetime(self.created_at),
             deleted=self.deleted,
         )
 
@@ -943,7 +944,7 @@ class Rent(db.Model):
             apartment=self.apartment,
             dt_start=seld.dt_start,
             dt_end=self.dt_end,
-            created_at=utils.convert_datetime(self.created_at),
+            created_at=utils.strfdatetime(self.created_at),
             deleted=self.deleted,
         )
 
@@ -1026,7 +1027,7 @@ class Reserve(db.Model):
             dt=seld.dt,
             period=self.period,
             image=self.image,
-            created_at=utils.convert_datetime(self.created_at),
+            created_at=utils.strfdatetime(self.created_at),
             deleted=self.deleted,
         )
 
@@ -1120,7 +1121,7 @@ class Message(db.Model):
             to_user=self.to_user,
             content=self.content,
             type=self.type,
-            created_at=utils.convert_datetime(self.created_at),
+            created_at=utils.strfdatetime(self.created_at),
             deleted=self.deleted,
         )
 
@@ -1212,7 +1213,7 @@ class Comment(db.Model):
             apartment=self.apartment,
             content=seld.content,
             rate=self.rate,
-            created_at=utils.convert_datetime(self.created_at),
+            created_at=utils.strfdatetime(self.created_at),
             deleted=self.deleted,
         )
 
