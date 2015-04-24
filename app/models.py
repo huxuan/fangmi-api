@@ -515,8 +515,8 @@ class Apartment(db.Model):
             reserve_choice_item = ReserveChoice.create(
                 self.id,
                 reserve_choice['date'],
-                reserve_choice['t_start'],
-                reserve_choice['t_end'],
+                reserve_choice['time_start'],
+                reserve_choice['time_end'],
             )
             self.reserve_choice_list.append(reserve_choice_item)
         db.session.commit()
@@ -567,13 +567,13 @@ class Apartment(db.Model):
         db.session.commit()
 
     @classmethod
-    def create(cls, user, community, title="", subtitle="", address="",
+    def create(cls, username, community_id, title="", subtitle="", address="",
         contract=None, num_bathroom=0, num_bedroom=0, num_livingroom=0,
         status=0, type=0, comments=[], devices=[], photos=[], rents=[],
         reserve_choices=[], reserves=[], rooms=[], tags=[]):
         apartment = cls(
-            user=user,
-            community=community,
+            username=username,
+            community_id=community_id,
             title=title,
             subtitle=subtitle,
             address=address,
@@ -650,8 +650,8 @@ class ReserveChoice(db.Model):
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
 
     date = db.Column(db.Date)
-    date_start = db.Column(db.Time)
-    date_end = db.Column(db.Time)
+    time_start = db.Column(db.Time)
+    time_end = db.Column(db.Time)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
@@ -661,12 +661,12 @@ class ReserveChoice(db.Model):
         return self.apartment.serialize()
 
     @classmethod
-    def create(cls, apartment_id, date, date_start, date_end):
+    def create(cls, apartment_id, date, time_start, time_end):
         reserve_choice = cls(
             apartment_id=apartment_id,
             date=date,
-            date_start=date_start,
-            date_end=date_end,
+            time_start=time_start,
+            time_end=time_end,
         )
         db.session.add(reserve_choice)
         db.session.commit()
@@ -683,8 +683,8 @@ class ReserveChoice(db.Model):
             id=self.id,
             #apartment=self.apartment_info,
             date=self.date.isoformat(),
-            date_start=self.date_start.isoformat(),
-            date_end=self.date_end.isoformat(),
+            time_start=self.time_start.isoformat(),
+            time_end=self.time_end.isoformat(),
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
         )
@@ -698,7 +698,7 @@ class Room(db.Model):
     area = db.Column(db.Integer)
     name = db.Column(db.String(16), nullable=False)
     price = db.Column(db.Integer)
-    date_entrance = db.Column(db.DateTime)
+    date_entrance = db.Column(db.Date)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
@@ -733,7 +733,7 @@ class Room(db.Model):
             area=self.area,
             name=self.name,
             price=self.price,
-            date_entrance=self.date_entrance,
+            date_entrance=self.date_entrance.isoformat(),
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
         )
@@ -947,8 +947,8 @@ class Rent(db.Model):
             id=self.id,
             user=self.user_info,
             #apartment=self.apartment_info,
-            date_start=self.date_start,
-            date_end=self.date_end,
+            date_start=self.date_start.isoformat(),
+            date_end=self.date_end.isoformat(),
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
         )
@@ -1129,27 +1129,6 @@ class Message(db.Model):
             deleted=self.deleted,
         )
 
-class Captcha(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-
-    mobile = db.Column(db.String(11), nullable=False, index=True)
-    token = db.Column(db.String(6), nullable=False, index=True)
-
-    created_at = db.Column(db.DateTime, default=datetime.now)
-    deleted = db.Column(db.Boolean, default=False)
-
-    @classmethod
-    def verify(cls, mobile, token):
-        return True # NOTE(huxuan): Hack verify() until captcha feature is done.
-        captcha = cls.query.filter_by(mobile=mobile).filter_by(deleted=False)\
-            .first()
-        if not captcha:
-            raise utils.APIException(utils.API_CODE_CAPTCHA_NOT_FOUND)
-        if captcha.token != token:
-            raise utils.APIException(utils.API_CODE_CAPTCHA_INVALID)
-        captcha.deleted = True
-        db.session.flush()
-
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -1220,6 +1199,29 @@ class Comment(db.Model):
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
         )
+
+
+class Captcha(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    mobile = db.Column(db.String(11), nullable=False, index=True)
+    token = db.Column(db.String(6), nullable=False, index=True)
+
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    deleted = db.Column(db.Boolean, default=False)
+
+    @classmethod
+    def verify(cls, mobile, token):
+        return True # NOTE(huxuan): Hack verify() until captcha feature is done.
+        captcha = cls.query.filter_by(mobile=mobile).filter_by(deleted=False)\
+            .first()
+        if not captcha:
+            raise utils.APIException(utils.API_CODE_CAPTCHA_NOT_FOUND)
+        if captcha.token != token:
+            raise utils.APIException(utils.API_CODE_CAPTCHA_INVALID)
+        captcha.deleted = True
+        db.session.flush()
+
 
 class Client(db.Model):
     client_id = db.Column(db.String(64), primary_key=True)
