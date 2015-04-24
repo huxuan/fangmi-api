@@ -77,37 +77,40 @@ class Fake(object):
 
     def fake_apartment(self):
         self.apartments = [
-            models.Apartment.create(self.users[0], self.communities[1],
-            title='title1', subtitle='subtitle1', address='address1',
-            num_bedroom=3, num_livingroom=1, type=0, comments=[
-                {'username': 'u1', 'content': 'content1', 'rate': 5},
-                {'username': 'u3', 'content': 'content2', 'rate': 1},
-            ], devices=[
-                {'name': 'name1', 'count': 1},
-                {'name': 'name2', 'count': 3},
-            ], photos=[
-                file('avatar.jpg'),
-            ], rents=[
-                {'username': 'u4', 'date_start': date(2013, 03, 28),
-                    'date_end': date(2014, 04, 01)},
-                {'username': 'u4', 'date_start': date(2013, 04, 28),
-                    'date_end': date(2015, 07, 26)},
-            ], reserve_choices=[
-                {'date': date(1950, 10, 01), 't_start': time(12, 34, 56),
-                    't_end': time(12, 56, 34)},
-                {'date': date(1951, 10, 01), 't_start': time(12, 34, 56),
-                    't_end': time(12, 56, 34)},
-            ], reserves=[
-            ], rooms=[
-                {'name': '主卧', 'area': 88, 'price': 8888,
-                    'date_entrance': date(1949, 10, 01)},
-                {'name': '次卧1', 'area': 66, 'price': 6666,
-                    'date_entrance': date(1950, 10, 01)},
-            ], tags=[
-                {'name': '标签1'},
-                {'name': '标签2'},
-                {'name': '标签3'},
-            ]),
+            models.Apartment.create(
+                self.users[0].username,
+                self.communities[1].id,
+                title='title1', subtitle='subtitle1', address='address1',
+                num_bedroom=3, num_livingroom=1, type=0, comments=[
+                    {'username': 'u1', 'content': 'content1', 'rate': 5},
+                    {'username': 'u3', 'content': 'content2', 'rate': 1},
+                ], devices=[
+                    {'name': 'name1', 'count': 1},
+                    {'name': 'name2', 'count': 3},
+                ], photos=[
+                    file('avatar.jpg'),
+                ], rents=[
+                    {'username': 'u4', 'date_start': date(2013, 03, 28),
+                        'date_end': date(2014, 04, 01)},
+                    {'username': 'u4', 'date_start': date(2013, 04, 28),
+                        'date_end': date(2015, 07, 26)},
+                ], reserve_choices=[
+                    {'date': date(1950, 10, 01), 'time_start': time(12, 34, 56),
+                        'time_end': time(12, 56, 34)},
+                    {'date': date(1951, 10, 01), 'time_start': time(12, 34, 56),
+                        'time_end': time(12, 56, 34)},
+                ], reserves=[
+                ], rooms=[
+                    {'name': '主卧', 'area': 88, 'price': 8888,
+                        'date_entrance': date(1949, 10, 01)},
+                    {'name': '次卧1', 'area': 66, 'price': 6666,
+                        'date_entrance': date(1950, 10, 01)},
+                ], tags=[
+                    {'name': '标签1'},
+                    {'name': '标签2'},
+                    {'name': '标签3'},
+                ],
+            ),
         ]
         self.apartments[0].reserves = [
             {
