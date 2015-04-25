@@ -12,10 +12,14 @@ import hashlib
 import os
 
 from flask import jsonify
+from flask.ext.restful import reqparse
 
 from app import app
 
 API_CODE_OK = 200
+API_CODE_NULL = 201
+API_CODE_REQUIRED = 202
+API_CODE_INVALID = 203
 API_CODE_APARTMENT_NOT_FOUND = 1001
 API_CODE_APARTMENT_NOT_AUTHORIZED = 1002
 API_CODE_CAPTCHA_INVALID = 2001
@@ -33,6 +37,9 @@ API_CODE_USER_NOT_FOUND = 9003
 
 API_CODE_MESSAGE = {
     API_CODE_OK: u'OK',
+    API_CODE_NULL: '字段不能为空。',
+    API_CODE_REQUIRED: '字段为必需字段。',
+    API_CODE_INVALID: '字段不合法。',
     API_CODE_APARTMENT_NOT_FOUND: '房屋不存在。',
     API_CODE_APARTMENT_NOT_AUTHORIZED: '您没有操作此房屋的权限。',
     API_CODE_CAPTCHA_INVALID: u'验证码错误，请确认验证码输入正确。',
@@ -75,6 +82,36 @@ class APIException(Exception, APIResponse):
 
 def api_response(*args, **kwargs):
     return jsonify(APIResponse(*args, **kwargs).to_dict())
+
+
+class Argument(reqparse.Argument):
+    def __init__(self, name, default=None, dest=None, required=False,
+        ignore=False, type=reqparse.text_type, location=('json', 'values',),
+        choices=(), action='store', help=None, operators=('=',),
+        case_sensitive=True, nullable=False):
+        self.nullable = nullable
+        super(Argument, self).__init__(name, default=default, dest=dest,
+            required=required, ignore=ignore, type=type, location=location,
+            choices=choices, action=action, help=help, operators=operators,
+            case_sensitive=case_sensitive)
+
+    def handle_validation_error(self, error):
+        pass
+
+    def parse(self, request):
+        result, _found = super(Argument, self).parse(request)
+        if not result and not self.nullable:
+            raise APIException(API_CODE_NULL, msg_params=self.name)
+        if not result and self.required:
+            raise APIException(API_CODE_REQUIRED, msg_params=self.name)
+        if self.choices and result not in self.choices:
+            raise APIException(API_CODE_INVALID, msg_params=self.name)
+
+class RequestParser(reqparse.RequestParser):
+    def __init__(self):
+        super(RequestParser, self).__init__(argument_class=Argument)
+
+reqparse.RequestParser = RequestParser
 
 
 def check_password_confirm(password, password_confirm):
