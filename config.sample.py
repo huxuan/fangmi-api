@@ -27,7 +27,7 @@ SQLALCHEMY_DATABASE_URI = 'mysql://{}:{}@{}/{}'.format(
 SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
 # The md5 for default avatar.
-DEFAULT_AVATAR_MD5 = 'DEFAULT_AVATAR_MD5'
+DEFAULT_AVATAR_MD5 = '587c36119c43e7383b739e6093c23150'
 
 # Data/Time format we use.
 DATE_FORMAT = '%Y-%m-%d'
