@@ -12,6 +12,7 @@ from datetime import time
 
 from app import app
 from app import models
+from app import utils
 
 SCHOOLS = []
 COMMUNITIES = []
@@ -88,7 +89,10 @@ class Fake(object):
                     {'name': 'name1', 'count': 1},
                     {'name': 'name2', 'count': 3},
                 ], photos=[
-                    file('avatar.jpg'),
+                    file(utils.get_path_from_md5(
+                        app.config['UPLOAD_AVATAR_FOLDER'],
+                        app.config['DEFAULT_AVATAR_MD5'],
+                    )),
                 ], rents=[
                     {'username': 'u4', 'date_start': date(2013, 03, 28),
                         'date_end': date(2014, 04, 01)},
