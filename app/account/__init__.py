@@ -100,7 +100,39 @@ class PasswordChangeAPI(Resource):
         return utils.api_response()
 
 
+class ApplyConfirmedAPI(Resource):
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('name', required=True)
+        self.parser.add_argument('id_number', required=True)
+
+    @oauth.require_oauth()
+    def post(self):
+        args = self.parser.parse_args(request)
+        user = request.oauth.user
+        user.set(**args)
+        return utils.api_response(payload=user.serialize())
+
+class ApplyStudentAPI(Resource):
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('name', required=True)
+        self.parser.add_argument('id_number', required=True)
+        self.parser.add_argument('school', required=True)
+        self.parser.add_argument('major', required=True)
+        self.parser.add_argument('student_id', required=True)
+
+    @oauth.require_oauth()
+    def post(self):
+        args = self.parser.parse_args(request)
+        user = request.oauth.user
+        user.set(**args)
+        return utils.api_response(payload=user.serialize())
+
+
 api.add_resource(AccountAPI, '')
 api.add_resource(RegisterAPI, '/register')
 api.add_resource(PasswordForgetAPI, '/password/forget')
 api.add_resource(PasswordChangeAPI, '/password/change')
+api.add_resource(ApplyConfirmedAPI, '/apply/confirmed')
+api.add_resource(ApplyStudentAPI, '/apply/student')
