@@ -16,6 +16,7 @@ from werkzeug import datastructures
 from .. import models
 from .. import utils
 from ..oauth import oauth
+from ..utils import reqparse
 
 apartment = Blueprint('apartment', __name__)
 api = Api(apartment)

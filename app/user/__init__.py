@@ -15,6 +15,7 @@ from flask.ext.restful import reqparse
 from .. import models
 from .. import utils
 from ..oauth import oauth
+from ..utils import reqparse
 
 user = Blueprint('user', __name__)
 api = Api(user)

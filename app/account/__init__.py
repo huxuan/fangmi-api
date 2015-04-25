@@ -17,6 +17,7 @@ from werkzeug import datastructures
 from .. import models
 from .. import utils
 from ..oauth import oauth
+from ..utils import reqparse
 
 account = Blueprint('account', __name__)
 api = Api(account)
