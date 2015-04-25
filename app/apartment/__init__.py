@@ -11,6 +11,7 @@ from flask import request
 from flask.ext.restful import Api
 from flask.ext.restful import Resource
 from flask.ext.restful import reqparse
+from werkzeug import datastructures
 
 from .. import models
 from .. import utils
@@ -49,6 +50,32 @@ class ApartmentAPI(Resource):
         return utils.api_response(payload=apartment.serialize())
 
 
+class ApartmentPhotosAPI(Resource):
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('id', type=int, required=True)
+        self.parser.add_argument('contract',
+            type=datastructures.FileStorage,
+            location='files',
+        )
+        self.parser.add_argument('photos',
+            type=datastructures.FileStorage,
+            location='files',
+            action='append',
+        )
+
+    @oauth.require_oauth()
+    def post(self):
+        print request.files
+        args = self.parser.parse_args(request)
+        print args['photos']
+        apartment = models.Apartment.get(args['id'])
+        user = request.oauth.user
+        if apartment.verify_owner(user.username):
+            apartment.set(**args)
+        return utils.api_response(payload=apartment.serialize())
+
+
 class ApartmentListAPI(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
@@ -64,4 +91,5 @@ class ApartmentListAPI(Resource):
 
 
 api.add_resource(ApartmentAPI, '')
+api.add_resource(ApartmentPhotosAPI, '/photos')
 api.add_resource(ApartmentListAPI, '/list')
