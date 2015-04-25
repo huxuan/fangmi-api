@@ -49,6 +49,7 @@ API_CODE_MESSAGE = {
     API_CODE_USER_NOT_FOUND: u'用户不存在。',
 }
 
+
 class APIResponse():
 
     def __init__(self, status_code=None, message=None, payload=None):
