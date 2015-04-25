@@ -17,9 +17,11 @@ from flask.ext.restful import reqparse
 from app import app
 
 API_CODE_OK = 200
-API_CODE_NULL = 201
-API_CODE_REQUIRED = 202
-API_CODE_INVALID = 203
+
+API_CODE_INVALID = 201
+API_CODE_NOT_FOUND = 202
+API_CODE_REQUIRED = 203
+
 API_CODE_APARTMENT_NOT_FOUND = 1001
 API_CODE_APARTMENT_NOT_AUTHORIZED = 1002
 API_CODE_CAPTCHA_INVALID = 2001
@@ -35,11 +37,17 @@ API_CODE_USER_DUPLICATE = 9001
 API_CODE_USER_NOT_AUTHORIZED = 9002
 API_CODE_USER_NOT_FOUND = 9003
 
+ARGUMENT_NAME = {
+    'username': '用户名',
+    'password': '密码',
+}
+
+
 API_CODE_MESSAGE = {
     API_CODE_OK: u'OK',
-    API_CODE_NULL: '字段不能为空。',
-    API_CODE_REQUIRED: '字段为必需字段。',
-    API_CODE_INVALID: '字段不合法。',
+    API_CODE_REQUIRED: '{name}不能为空。',
+    API_CODE_INVALID: '{name}不合法。',
+    API_CODE_NOT_FOUND: '{name}不存在。',
     API_CODE_APARTMENT_NOT_FOUND: '房屋不存在。',
     API_CODE_APARTMENT_NOT_AUTHORIZED: '您没有操作此房屋的权限。',
     API_CODE_CAPTCHA_INVALID: u'验证码错误，请确认验证码输入正确。',
@@ -59,10 +67,10 @@ API_CODE_MESSAGE = {
 
 class APIResponse():
 
-    def __init__(self, status_code=None, message=None, payload=None):
+    def __init__(self, status_code=None, message=None, payload=None, **kwargs):
         self.status_code = status_code or API_CODE_OK
-        self.message = message or API_CODE_MESSAGE.get(
-            self.status_code, u'Invalid status code.')
+        self.message = message or API_CODE_MESSAGE[self.status_code]
+        self.message = self.message.format(**kwargs)
         self.payload = payload
 
     def to_dict(self):
@@ -85,27 +93,19 @@ def api_response(*args, **kwargs):
 
 
 class Argument(reqparse.Argument):
-    def __init__(self, name, default=None, dest=None, required=False,
-        ignore=False, type=reqparse.text_type, location=('json', 'values',),
-        choices=(), action='store', help=None, operators=('=',),
-        case_sensitive=True, nullable=False):
-        self.nullable = nullable
-        super(Argument, self).__init__(name, default=default, dest=dest,
-            required=required, ignore=ignore, type=type, location=location,
-            choices=choices, action=action, help=help, operators=operators,
-            case_sensitive=case_sensitive)
 
     def handle_validation_error(self, error):
-        pass
+        name = ARGUMENT_NAME.get(self.name) or self.name
+        if 'Missing required parameter' in error.message:
+            raise APIException(API_CODE_REQUIRED, name=name)
+        if 'not a valid choice' in error.message:
+            raise APIException(API_CODE_INVALID, name=name)
+        super(Argument, self).handle_validation_error(error)
 
     def parse(self, request):
         result, _found = super(Argument, self).parse(request)
-        if not result and not self.nullable:
-            raise APIException(API_CODE_NULL, msg_params=self.name)
         if not result and self.required:
-            raise APIException(API_CODE_REQUIRED, msg_params=self.name)
-        if self.choices and result not in self.choices:
-            raise APIException(API_CODE_INVALID, msg_params=self.name)
+            raise APIException(API_CODE_REQUIRED, params=self.name)
 
 class RequestParser(reqparse.RequestParser):
     def __init__(self):
