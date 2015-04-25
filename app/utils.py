@@ -128,7 +128,10 @@ def get_path_from_md5(folder, file_md5):
 
 
 def get_url_from_md5(folder, file_md5):
-    return '/'.join(['', folder, file_md5[:2], file_md5[2:4], file_md5[4:]])
+    if file_md5:
+        return '/'.join(['', folder, file_md5[:2], file_md5[2:4], file_md5[4:]])
+    else:
+        return None
 
 
 def save_file(stream, folder):
