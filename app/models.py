@@ -618,6 +618,18 @@ class Apartment(db.Model):
         res = res.all()
         return res
 
+    def set(self, **kwargs):
+        for key in kwargs:
+            print key
+            if kwargs[key] is not None:
+                setattr(self, key, kwargs[key])
+        db.session.flush()
+
+    def verify_owner(self, username):
+        if self.username != username:
+            raise utils.APIException(utils.API_CODE_APARTMENT_NOT_AUTHORIZED)
+        return True
+
     def serialize(self):
         return dict(
             id=self.id,
