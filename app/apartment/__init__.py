@@ -67,9 +67,7 @@ class ApartmentPhotosAPI(Resource):
 
     @oauth.require_oauth()
     def post(self):
-        print request.files
         args = self.parser.parse_args(request)
-        print args['photos']
         apartment = models.Apartment.get(args['id'])
         user = request.oauth.user
         if apartment.verify_owner(user.username):
