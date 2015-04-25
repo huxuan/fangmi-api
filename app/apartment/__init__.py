@@ -32,17 +32,21 @@ class ApartmentAPI(Resource):
 
     @oauth.require_oauth()
     def post(self):
+        # NOTE(huxuan): We may need validation for post data here.
+        args = request.get_json()
         apartment = models.Apartment.create(
-            address=request.json['address'],
-            devices=request.json['devices'],
-            num_bedroom=request.json['num_bedroom'],
-            num_livingroom=request.json['num_livingroom'],
-            reserve_choices=request.json['reserve_choices'],
-            rooms=request.json['rooms'],
-            subtitle=request.json['subtitle'],
-            tags=request.json['tags'],
-            title=request.json['title'],
+            address=args['address'],
+            devices=args['devices'],
+            num_bedroom=args['num_bedroom'],
+            num_livingroom=args['num_livingroom'],
+            reserve_choices=args['reserve_choices'],
+            rooms=args['rooms'],
+            subtitle=args['subtitle'],
+            tags=args['tags'],
+            title=args['title'],
+            type=args['type'],
         )
+        return utils.api_response(payload=apartment.serialize())
 
 
 class ApartmentListAPI(Resource):
