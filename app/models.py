@@ -799,7 +799,7 @@ class Photo(db.Model):
 
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
 
-    photo_md5 = db.Column(db.String(32), nullable=False, unique=True)
+    photo_md5 = db.Column(db.String(32), nullable=False)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
