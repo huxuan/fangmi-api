@@ -469,7 +469,7 @@ class Apartment(db.Model):
             device_item = Device.create(
                 self.id,
                 device['name'],
-                device['count'],
+                device.get('count', None),
             )
             self.device_list.append(device_item)
         db.session.commit()
@@ -745,7 +745,7 @@ class Device(db.Model):
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
 
     name = db.Column(db.String(64), nullable=False, unique=True, index=True)
-    count = db.Column(db.Integer)
+    count = db.Column(db.Integer, default=1)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)

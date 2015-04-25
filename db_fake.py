@@ -88,6 +88,8 @@ class Fake(object):
                 ], devices=[
                     {'name': 'name1', 'count': 1},
                     {'name': 'name2', 'count': 3},
+                    {'name': 'test_for_no_count'},
+                    {'name': 'test_for_none_count', 'count': None},
                 ], photos=[
                     file(utils.get_path_from_md5(
                         app.config['UPLOAD_AVATAR_FOLDER'],
