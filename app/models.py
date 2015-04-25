@@ -48,7 +48,7 @@ class User(db.Model):
     avatar_md5 = db.Column(db.String(32),
         default=app.config['DEFAULT_AVATAR_MD5'])
     status = db.Column(db.Text)
-    birthday = db.Column(db.Date, default=date.today)
+    birthday = db.Column(db.Date)
     horoscope = db.Column(db.SmallInteger)
     gender = db.Column(db.Boolean)
 
@@ -133,6 +133,10 @@ class User(db.Model):
     def fav_apartments(self):
         return [apartment.serialize() for apartment in self.fav_apartment_list]
 
+    @property
+    def birthday_info(self):
+        return self.birthday and self.birthday.isoformat()
+
     @classmethod
     def getter(cls, username, password, *args, **kwargs):
         user = cls.get(username)
@@ -188,7 +192,7 @@ class User(db.Model):
             nickname=self.nickname,
             avatar=self.avatar,
             status=self.status,
-            birthday=self.birthday.isoformat(),
+            birthday=self.birthday_info,
             horoscope=self.horoscope,
             gender=self.gender,
             mobile=self.mobile,
@@ -199,20 +203,16 @@ class User(db.Model):
             fav_apartments=self.fav_apartments,
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
+            # Student related information.
+            school=self.school,
+            major=self.major,
+            student_id=self.student_id,
+            pic_student=self.pic_student,
+            pic_portal=self.pic_portal,
+            # Real name confirm information.
+            name=self.name,
+            id_number=self.id_number,
         )
-        if self.is_student:
-            res.update(dict(
-                school=self.school,
-                major=self.major,
-                student_id=self.student_id,
-                pic_student=self.pic_student,
-                pic_portal=self.pic_portal,
-            ))
-        if self.is_confirmed:
-            res.update(dict(
-                name=self.name,
-                id_number=self.id_number,
-            ))
         return res
 
 
