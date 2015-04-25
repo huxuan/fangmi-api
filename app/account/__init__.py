@@ -121,6 +121,9 @@ class ApplyStudentAPI(Resource):
         self.parser.add_argument('school', required=True)
         self.parser.add_argument('major', required=True)
         self.parser.add_argument('student_id', required=True)
+        self.parser.add_argument('pic_student', required=True,
+            type=datastructures.FileStorage, location='files',
+        )
 
     @oauth.require_oauth()
     def post(self):
