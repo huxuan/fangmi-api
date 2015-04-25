@@ -81,8 +81,16 @@ class Fake(object):
             models.Apartment.create(
                 self.users[0].username,
                 self.communities[1].id,
-                title='title1', subtitle='subtitle1', address='address1',
-                num_bedroom=3, num_livingroom=1, type=0, comments=[
+                title='title1',
+                subtitle='subtitle1',
+                address='address1',
+                num_bedroom=3,
+                num_livingroom=1,
+                type=0,
+                contract=file(utils.get_path_from_md5(
+                    app.config['UPLOAD_AVATAR_FOLDER'],
+                    app.config['DEFAULT_AVATAR_MD5'],
+                )), comments=[
                     {'username': 'u1', 'content': 'content1', 'rate': 5},
                     {'username': 'u3', 'content': 'content2', 'rate': 1},
                 ], devices=[
@@ -91,6 +99,10 @@ class Fake(object):
                     {'name': 'test_for_no_count'},
                     {'name': 'test_for_none_count', 'count': None},
                 ], photos=[
+                    file(utils.get_path_from_md5(
+                        app.config['UPLOAD_AVATAR_FOLDER'],
+                        app.config['DEFAULT_AVATAR_MD5'],
+                    )),
                     file(utils.get_path_from_md5(
                         app.config['UPLOAD_AVATAR_FOLDER'],
                         app.config['DEFAULT_AVATAR_MD5'],
