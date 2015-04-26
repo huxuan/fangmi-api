@@ -120,13 +120,14 @@ class ApartmentPhotosAPI(Resource):
 class ApartmentListAPI(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('id', action='append', default=[])
+        self.parser.add_argument('username')
+        self.parser.add_argument('community_id', type=int)
 
     def get(self):
         args = self.parser.parse_args(request)
         payload = dict(
-            apartments=[models.Apartment.get(id).serialize()
-                for id in args['id']]
+            apartments=[apartment.serialize()
+                for apartment in models.Apartment.gets(**args)],
         )
         return utils.api_response(payload=payload)
 
