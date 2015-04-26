@@ -440,6 +440,8 @@ class Apartment(db.Model):
         lazy='dynamic')
     device_list = db.relationship('Device', backref='apartment', lazy='dynamic')
     photo_list = db.relationship('Photo', backref='apartment', lazy='dynamic')
+    reserve_list = db.relationship('Reserve', backref='apartment',
+        lazy='dynamic')
     reserve_choice_list = db.relationship('ReserveChoice', backref='apartment',
         lazy='dynamic')
     room_list = db.relationship('Room', backref='apartment', lazy='dynamic')
@@ -664,6 +666,9 @@ class ReserveChoice(db.Model):
     date = db.Column(db.Date)
     time_start = db.Column(db.Time)
     time_end = db.Column(db.Time)
+
+    reserves = db.relationship('Reserve', backref='reserve_choice',
+        lazy='dynamic')
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
@@ -1014,6 +1019,7 @@ class Reserve(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     username = db.Column(db.String(32), db.ForeignKey('users.username'))
+    apartment_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
     reserve_choice_id = db.Column(db.Integer,
         db.ForeignKey('reserve_choices.id'))
 
@@ -1036,8 +1042,10 @@ class Reserve(db.Model):
 
     @classmethod
     def create(cls, username, reserve_choice_id):
+        reserve_choice = ReserveChoice.get(reserve_choice_id)
         reserve = cls(
             username=username,
+            apartment_id=reserve_choice.apartment_id,
             reserve_choice_id=reserve_choice_id,
         )
         db.session.add(reserve)
@@ -1060,8 +1068,7 @@ class Reserve(db.Model):
         if username:
             res = res.filter_by(username=username)
         if apartment_id:
-            res = res.filter(
-                Reserve.reserve_choice.apartment_id == apartment_id)
+            res = res.filter_by(apartment_id=apartment_id)
         if filter_deleted:
             res = res.filter_by(deleted=False)
         res = res.all()
