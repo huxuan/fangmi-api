@@ -11,6 +11,7 @@ import cStringIO as StringIO
 import hashlib
 import os
 
+from flask import json
 from flask import jsonify
 from flask.ext.restful import reqparse
 
@@ -38,8 +39,9 @@ API_CODE_USER_NOT_AUTHORIZED = 9002
 API_CODE_USER_NOT_FOUND = 9003
 
 ARGUMENT_NAME = {
-    'username': '用户名',
+    'json': 'Json 数据',
     'password': '密码',
+    'username': '用户名',
 }
 
 
@@ -95,23 +97,30 @@ def api_response(*args, **kwargs):
 class Argument(reqparse.Argument):
 
     def handle_validation_error(self, error):
-        name = ARGUMENT_NAME.get(self.name) or self.name
+        self.arg_name = ARGUMENT_NAME.get(self.name) or self.name
         if 'Missing required parameter' in error.message:
-            raise APIException(API_CODE_REQUIRED, name=name)
+            raise APIException(API_CODE_REQUIRED, name=self.arg_name)
         if 'not a valid choice' in error.message:
-            raise APIException(API_CODE_INVALID, name=name)
+            raise APIException(API_CODE_INVALID, name=self.arg_name)
         super(Argument, self).handle_validation_error(error)
 
     def parse(self, request):
         result, _found = super(Argument, self).parse(request)
         if not result and self.required:
-            raise APIException(API_CODE_REQUIRED, params=self.name)
+            raise APIException(API_CODE_REQUIRED, name=self.arg_name)
 
 class RequestParser(reqparse.RequestParser):
     def __init__(self):
         super(RequestParser, self).__init__(argument_class=Argument)
 
 reqparse.RequestParser = RequestParser
+
+
+def json_type(data, name='json'):
+    try:
+        return json.loads(data)
+    except:
+        raise APIException(API_CODE_INVALID, name=name)
 
 
 def check_password_confirm(password, password_confirm):
