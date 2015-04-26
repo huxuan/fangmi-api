@@ -21,8 +21,9 @@ from app import app
 API_CODE_OK = 200
 
 API_CODE_INVALID = 201
-API_CODE_NOT_FOUND = 202
-API_CODE_REQUIRED = 203
+API_CODE_NOT_AUTHORIZED = 202
+API_CODE_NOT_FOUND = 203
+API_CODE_REQUIRED = 204
 
 API_CODE_APARTMENT_NOT_FOUND = 1001
 API_CODE_APARTMENT_NOT_AUTHORIZED = 1002
@@ -40,6 +41,7 @@ API_CODE_USER_NOT_AUTHORIZED = 9002
 API_CODE_USER_NOT_FOUND = 9003
 
 ARGUMENT_NAME = {
+    'apartment': '房屋',
     'devices': '设备',
     'devices.count': '设备数量',
     'devices.name': '设备名称',
@@ -49,6 +51,7 @@ ARGUMENT_NAME = {
     'password': '密码',
     'pic_student': '学生证图片',
     'real_name': '姓名',
+    'rent': '租房记录',
     'reserve_choices': '预约时间',
     'reserve_choices.date': '预约日期',
     'reserve_choices.time_end': '预约的结束时间',
@@ -68,11 +71,11 @@ ARGUMENT_NAME = {
 
 API_CODE_MESSAGE = {
     API_CODE_OK: u'OK',
-    API_CODE_REQUIRED: '{name}不能为空。',
     API_CODE_INVALID: '{name}不合法。',
+    API_CODE_NOT_AUTHORIZED: '您没有操作此{name}的权限。',
     API_CODE_NOT_FOUND: '{name}不存在。',
+    API_CODE_REQUIRED: '{name}不能为空。',
     API_CODE_APARTMENT_NOT_FOUND: '房屋不存在。',
-    API_CODE_APARTMENT_NOT_AUTHORIZED: '您没有操作此房屋的权限。',
     API_CODE_CAPTCHA_INVALID: u'验证码错误，请确认验证码输入正确。',
     API_CODE_CAPTCHA_NOT_FOUND: u'该手机号无对应验证码，请重新获取。',
     API_CODE_COMMUNITY_NOT_FOUND: u'小区不存在。',

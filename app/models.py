@@ -653,7 +653,8 @@ class Apartment(db.Model):
 
     def verify_owner(self, username):
         if self.username != username:
-            raise utils.APIException(utils.API_CODE_APARTMENT_NOT_AUTHORIZED)
+            raise utils.APIException(utils.API_CODE_NOT_AUTHORIZED,
+                name=self.__tablename__)
         return True
 
     def serialize(self):
@@ -673,7 +674,7 @@ class Apartment(db.Model):
             comments=self.comments,
             devices=self.devices,
             photos=self.photos,
-            rents=self.rents,
+            #rents=self.rents,
             reserve_choices=self.reserve_choices,
             reserves=self.reserves,
             rooms=self.rooms,
@@ -942,7 +943,7 @@ class Rent(db.Model):
         return self.apartment.serialize()
 
     @classmethod
-    def create(cls, username, apartment_id, date_start, date_end):
+    def create(cls, username, apartment_id, date_start, date_end, **kwargs):
         rent = cls(
             username=username,
             apartment_id=apartment_id,
@@ -979,6 +980,11 @@ class Rent(db.Model):
             if kwargs[key] is not None:
                 setattr(self, key, kwargs[key])
         db.session.flush()
+
+    def verify_owner(self, username):
+        if self.username != username and self.apartment.username != username:
+            raise utils.APIException(utils.API_CODE_NOT_AUTHORIZED,
+                name=self.__tablename__)
 
     def serialize(self):
         return dict(
