@@ -35,7 +35,7 @@ class UserAPI(Resource):
         return utils.api_response(payload=payload)
 
 
-class UserListAPI(Resource):
+class ListAPI(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('username', action='append', default=[])
@@ -50,4 +50,4 @@ class UserListAPI(Resource):
 
 
 api.add_resource(UserAPI, '')
-api.add_resource(UserListAPI, '/list')
+api.add_resource(ListAPI, '/list')
