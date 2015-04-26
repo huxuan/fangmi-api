@@ -90,7 +90,7 @@ class ApartmentAPI(Resource):
         return utils.api_response(payload=payload)
 
 
-class ApartmentPhotosAPI(Resource):
+class PhotosAPI(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('id', type=int, required=True)
@@ -117,7 +117,33 @@ class ApartmentPhotosAPI(Resource):
         return utils.api_response(payload=payload)
 
 
-class ApartmentListAPI(Resource):
+class FavoriteAPI(Resource):
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('id', required=True)
+        self.parser.add_argument('action', default='append',
+            choices=('append', 'remove'))
+
+    @oauth.require_oauth()
+    def get(self):
+        user = request.oauth.user
+        payload = dict(
+            aparments=user.fav_apartments,
+        )
+        return utils.api_response(payload=payload)
+
+    @oauth.require_oauth()
+    def post(self):
+        args = self.parser.parse_args(request)
+        user = request.oauth.user
+        user.fav_apartment_action(args['id'], args['action'])
+        payload = dict(
+            aparments=user.fav_apartments,
+        )
+        return utils.api_response(payload=payload)
+
+
+class ListAPI(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('username')
@@ -133,5 +159,6 @@ class ApartmentListAPI(Resource):
 
 
 api.add_resource(ApartmentAPI, '')
-api.add_resource(ApartmentPhotosAPI, '/photos')
-api.add_resource(ApartmentListAPI, '/list')
+api.add_resource(PhotosAPI, '/photos')
+api.add_resource(FavoriteAPI, '/fav')
+api.add_resource(ListAPI, '/list')

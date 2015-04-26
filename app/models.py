@@ -133,6 +133,16 @@ class User(db.Model):
     def fav_apartments(self):
         return [apartment.serialize() for apartment in self.fav_apartment_list]
 
+    @fav_apartments.setter
+    def fav_apartments(self, apartments):
+        for apartment in apartments:
+            self.apartment_list.append(apartment)
+
+    @fav_apartments.deleter
+    def fav_apartments(self):
+        for apartment in self.apartment_list:
+            self.apartment_list.remove(apartment)
+
     @property
     def birthday_info(self):
         return self.birthday and self.birthday.isoformat()
@@ -186,6 +196,23 @@ class User(db.Model):
         else:
             raise utils.APIException(utils.API_CODE_PASSWORD_INVALID)
 
+    def append_fav_apartment(self, apartment):
+        self.fav_apartment_list.append(apartment)
+
+    def remove_fav_apartment(self, apartment):
+        self.fav_apartment_list.remove(apartment)
+
+    def fav_apartment_action(self, apartment_id, action):
+        apartment = Apartment.get(apartment_id)
+        if action == 'append' and not self.is_fav_apartment(apartment_id):
+            self.append_fav_apartment(apartment)
+        elif action == 'remove' and self.is_fav_apartment(apartment_id):
+            self.remove_fav_apartment(apartment)
+
+    def is_fav_apartment(self, apartment_id):
+        return self.fav_apartment_list.filter(
+            users_fav_apartments.c.apartment_id == apartment_id).count() > 0
+
     def serialize(self):
         res = dict(
             username=self.username,
@@ -200,7 +227,7 @@ class User(db.Model):
             num_unread_messages=self.num_unread_messages,
             is_confirmed=self.is_confirmed,
             is_student=self.is_student,
-            fav_apartments=self.fav_apartments,
+            #fav_apartments=self.fav_apartments,
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
             # Student related information.
