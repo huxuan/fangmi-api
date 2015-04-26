@@ -756,7 +756,7 @@ class Device(db.Model):
 
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
 
-    name = db.Column(db.String(64), nullable=False, unique=True, index=True)
+    name = db.Column(db.String(64), nullable=False, index=True)
     count = db.Column(db.Integer, default=1)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
