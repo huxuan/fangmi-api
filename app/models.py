@@ -126,10 +126,10 @@ class User(db.Model):
 
     @property
     def num_unread_messages(self):
-        return Message.query.filter(
-            Message.to_username==self.username,
-            Message.unread==True,
-            Message.deleted==False,
+        return Message.query.filter_by(
+            to_username=username,
+            unread=True,
+            deleted=False,
         ).count()
 
     @property
