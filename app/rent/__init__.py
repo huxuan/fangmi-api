@@ -27,15 +27,12 @@ api = Api(rent)
 class RentAPI(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('id', type=int)
-        self.parser.add_argument('apartment_id')
-        self.parser.add_argument('date_start', type=utils.strpdate)
-        self.parser.add_argument('date_end', type=utils.strpdate)
 
     @oauth.require_oauth()
     def get(self):
-        args = self.parser.parse_args(request)
-        utils.parser_required('rents', args, ['id'])
+        parser = self.parser.copy()
+        parser.add_argument('id', type=int, required=True)
+        args = parser.parse_args(request)
         rent = models.Rent.get(args['id'])
         rent.verify_owner(request.oauth.user.username)
         payload = dict(
@@ -46,9 +43,11 @@ class RentAPI(Resource):
 
     @oauth.require_oauth()
     def post(self):
-        args = self.parser.parse_args(request)
-        utils.parser_required('rents', args,
-            ['apartment_id', 'date_start', 'date_end'])
+        parser = self.parser.copy()
+        parser.add_argument('apartment_id', required=True)
+        parser.add_argument('date_start', type=utils.strpdate, required=True)
+        parser.add_argument('date_end', type=utils.strpdate, required=True)
+        args = parser.parse_args(request)
         args['username'] = request.oauth.user.username
         rent = models.Rent.create(**args)
         payload = dict(
@@ -60,11 +59,12 @@ class RentAPI(Resource):
 class ListAPI(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('apartment_id', type=int)
 
     @oauth.require_oauth()
     def get(self):
-        args = self.parser.parse_args(request)
+        parser = self.parser.copy()
+        parser.add_argument('apartment_id', type=int)
+        args = parser.parse_args(request)
         if args.get('apartment_id'):
             apartment = models.Apartment.get(args['apartment_id'])
             apartment.verify_owner(request.oauth.user.username)
