@@ -29,7 +29,10 @@ class UserAPI(Resource):
     def get(self):
         args = self.parser.parse_args(request)
         user = models.User.get(args['username'])
-        return utils.api_response(payload=user.serialize())
+        payload = dict(
+            user=user.serialize()
+        )
+        return utils.api_response(payload=payload)
 
 
 class UserListAPI(Resource):
@@ -41,7 +44,7 @@ class UserListAPI(Resource):
         args = self.parser.parse_args(request)
         payload = dict(
             users=[models.User.get(username).serialize()
-                for username in args['username']]
+                for username in args['username']],
         )
         return utils.api_response(payload=payload)
 
