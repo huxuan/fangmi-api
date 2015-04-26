@@ -70,6 +70,8 @@ API_CODE_MESSAGE = {
 class APIResponse():
 
     def __init__(self, status_code=None, message=None, payload=None, **kwargs):
+        if 'name' in kwargs and kwargs['name'] in ARGUMENT_NAME:
+            kwargs['name'] = ARGUMENT_NAME[kwargs['name']]
         self.status_code = status_code or API_CODE_OK
         self.message = message or API_CODE_MESSAGE[self.status_code]
         self.message = self.message.format(**kwargs)
@@ -97,17 +99,19 @@ def api_response(*args, **kwargs):
 class Argument(reqparse.Argument):
 
     def handle_validation_error(self, error):
-        self.arg_name = ARGUMENT_NAME.get(self.name) or self.name
         if 'Missing required parameter' in error.message:
-            raise APIException(API_CODE_REQUIRED, name=self.arg_name)
+            raise APIException(API_CODE_REQUIRED, name=self.name)
         if 'not a valid choice' in error.message:
-            raise APIException(API_CODE_INVALID, name=self.arg_name)
+            raise APIException(API_CODE_INVALID, name=self.name)
+        if isinstance(error, APIException):
+            raise error
         super(Argument, self).handle_validation_error(error)
 
     def parse(self, request):
         result, _found = super(Argument, self).parse(request)
         if not result and self.required:
-            raise APIException(API_CODE_REQUIRED, name=self.arg_name)
+            raise APIException(API_CODE_REQUIRED, name=self.name)
+        return result, _found
 
 class RequestParser(reqparse.RequestParser):
     def __init__(self):
