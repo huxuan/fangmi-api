@@ -69,7 +69,8 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
-    apartment_list = db.relationship('Apartment', backref='user', lazy='dynamic')
+    apartment_list = db.relationship('Apartment', backref='user',
+        lazy='dynamic')
     rent_list = db.relationship('Rent', backref='user', lazy='dynamic')
     reserve_list = db.relationship('Reserve', backref='user', lazy='dynamic')
     comment_list = db.relationship('Comment', backref='user', lazy='dynamic')
@@ -439,10 +440,7 @@ class Apartment(db.Model):
         lazy='dynamic')
     device_list = db.relationship('Device', backref='apartment', lazy='dynamic')
     photo_list = db.relationship('Photo', backref='apartment', lazy='dynamic')
-    rent_list = db.relationship('Rent', backref='apartment', lazy='dynamic')
     reserve_choice_list = db.relationship('ReserveChoice', backref='apartment',
-        lazy='dynamic')
-    reserve_list = db.relationship('Reserve', backref='apartment',
         lazy='dynamic')
     room_list = db.relationship('Room', backref='apartment', lazy='dynamic')
 
@@ -524,22 +522,6 @@ class Apartment(db.Model):
         db.session.commit()
 
     @property
-    def rents(self):
-        return [rent.serialize() for rent in self.rent_list]
-
-    @rents.setter
-    def rents(self, rents):
-        for rent in rents:
-            rent_item = Rent.create(
-                rent['username'],
-                self.id,
-                rent['date_start'],
-                rent['date_end'],
-            )
-            self.rent_list.append(rent_item)
-        db.session.commit()
-
-    @property
     def reserve_choices(self):
         return [reserve_choice.serialize()
             for reserve_choice in self.reserve_choice_list]
@@ -554,21 +536,6 @@ class Apartment(db.Model):
                 reserve_choice['time_end'],
             )
             self.reserve_choice_list.append(reserve_choice_item)
-        db.session.commit()
-
-    @property
-    def reserves(self):
-        return [reserve.serialize() for reserve in self.reserve_list]
-
-    @reserves.setter
-    def reserves(self, reserves):
-        for reserve in reserves:
-            reserve_item = Reserve.create(
-                reserve['username'],
-                self.id,
-                reserve['choice_id'],
-            )
-            self.reserve_list.append(reserve_item)
         db.session.commit()
 
     @property
@@ -604,8 +571,8 @@ class Apartment(db.Model):
     @classmethod
     def create(cls, username, community_id, title="", subtitle="", address="",
         contract=None, num_bathroom=0, num_bedroom=0, num_livingroom=0,
-        status=0, type=0, comments=[], devices=[], photos=[], rents=[],
-        reserve_choices=[], reserves=[], rooms=[], tags=[], **kwargs):
+        status=0, type=0, comments=[], devices=[], photos=[],
+        reserve_choices=[], rooms=[], tags=[], **kwargs):
         apartment = cls(
             username=username,
             community_id=community_id,
@@ -621,9 +588,7 @@ class Apartment(db.Model):
             comments=comments,
             devices=devices,
             photos=photos,
-            rents=rents,
             reserve_choices=reserve_choices,
-            reserves=reserves,
             rooms=rooms,
             tags=tags,
         )
@@ -682,9 +647,7 @@ class Apartment(db.Model):
             comments=self.comments,
             devices=self.devices,
             photos=self.photos,
-            #rents=self.rents,
             reserve_choices=self.reserve_choices,
-            reserves=self.reserves,
             rooms=self.rooms,
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
