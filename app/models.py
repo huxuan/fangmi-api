@@ -721,6 +721,25 @@ class ReserveChoice(db.Model):
         db.session.commit()
         return reserve_choice
 
+    @classmethod
+    def get(cls, id, filter_deleted=True, nullable=False):
+        res = cls.query.filter_by(id=id)
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        res = res.first()
+        if not nullable and not res:
+            raise utils.APIException(utils.API_CODE_NOT_FOUND,
+                name=self.__tablename__)
+        return res
+
+    @classmethod
+    def gets(cls, apartment_id, filter_deleted=True):
+        res = cls.query.filter_by(apartment_id=apartment_id)
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        res = res.all()
+        return res
+
     def set(self, **kwargs):
         for key in kwargs:
             if kwargs[key] is not None:
