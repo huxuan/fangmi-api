@@ -6,6 +6,7 @@ Author: huxuan
 Email: i(at)huxuan.org
 Description: Shared library for FangMi.
 """
+from datetime import datetime
 from shutil import copyfileobj
 import cStringIO as StringIO
 import hashlib
@@ -39,8 +40,22 @@ API_CODE_USER_NOT_AUTHORIZED = 9002
 API_CODE_USER_NOT_FOUND = 9003
 
 ARGUMENT_NAME = {
+    'devices': '设备',
+    'devices.count': '设备数量',
+    'devices.name': '设备名称',
     'json': 'Json 数据',
     'password': '密码',
+    'reserve_choices': '预约时间',
+    'reserve_choices.date': '预约日期',
+    'reserve_choices.time_end': '预约的结束时间',
+    'reserve_choices.time_start': '预约的开始时间',
+    'rooms': '房间',
+    'rooms.area': '房间面积',
+    'rooms.date_entrance': '房间入住时间',
+    'rooms.name': '房间名称',
+    'rooms.price': '房间价格',
+    'tags': '标签',
+    'tags.name': '标签名称',
     'username': '用户名',
 }
 
@@ -105,7 +120,7 @@ class Argument(reqparse.Argument):
             raise APIException(API_CODE_INVALID, name=self.name)
         if isinstance(error, APIException):
             raise error
-        super(Argument, self).handle_validation_error(error)
+        raise APIException(API_CODE_INVALID, name=self.name)
 
     def parse(self, request):
         result, _found = super(Argument, self).parse(request)
@@ -113,9 +128,11 @@ class Argument(reqparse.Argument):
             raise APIException(API_CODE_REQUIRED, name=self.name)
         return result, _found
 
+
 class RequestParser(reqparse.RequestParser):
     def __init__(self):
         super(RequestParser, self).__init__(argument_class=Argument)
+
 
 reqparse.RequestParser = RequestParser
 
@@ -125,6 +142,24 @@ def json_type(data, name='json'):
         return json.loads(data)
     except:
         raise APIException(API_CODE_INVALID, name=name)
+
+
+def parser_required(name, data, keys):
+    for key in keys:
+        if key not in data:
+            raise APIException(API_CODE_REQUIRED,
+                name='{}.{}'.format(name, key))
+
+
+def parser_parse(name, data, key_parses):
+    for key, parse in key_parses:
+        try:
+            data[key] = parse(data[key])
+        except Exception, e:
+            raise APIException(API_CODE_INVALID, name='{}.{}'.format(name, key))
+        if hasattr(data[key], 'isoformat'):
+            data[key] = data[key].isoformat()
+    return data
 
 
 def check_password_confirm(password, password_confirm):
@@ -154,7 +189,7 @@ def strpdate(d):
 
 def strptime(t):
     """ Convert from string to datetime.time object. """
-    return time.strptime(t, app.config['TIME_FORMAT']).time()
+    return datetime.strptime(t, app.config['TIME_FORMAT']).time()
 
 
 def strpdatetime(dt):

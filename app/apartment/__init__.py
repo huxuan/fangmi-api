@@ -22,10 +22,53 @@ apartment = Blueprint('apartment', __name__)
 api = Api(apartment)
 
 
+def device_type(device, name):
+    utils.parser_required(name, device, ['name', 'count'])
+    device = utils.parser_parse(name, device, [('count', int)])
+    return device
+
+
+def reserve_choice_type(reserve_choice, name):
+    utils.parser_required(name, reserve_choice,
+        ['date', 'time_start', 'time_end'])
+    reserve_choice = utils.parser_parse(name, reserve_choice,
+        [
+            ('date', utils.strpdate),
+            ('time_start', utils.strptime),
+            ('time_end', utils.strptime),
+        ])
+    return reserve_choice
+
+
+def room_type(room, name):
+    utils.parser_required(name, room,
+        ['name', 'area', 'price', 'date_entrance'])
+    room = utils.parser_parse(name, room,
+        [('area', int), ('price', int), ('date_entrance', utils.strpdate)])
+    return room
+
+
+def tag_type(tag, name):
+    utils.parser_required(name, tag, ['name'])
+    return tag
+
+
 class ApartmentAPI(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('id', type=int, default=None)
+        self.parser.add_argument('community_id', type=int)
+        self.parser.add_argument('title')
+        self.parser.add_argument('subtitle')
+        self.parser.add_argument('address')
+        self.parser.add_argument('num_bedroom', type=int)
+        self.parser.add_argument('num_livingroom', type=int)
+        self.parser.add_argument('type', type=int)
+        self.parser.add_argument('devices', type=device_type, action='append')
+        self.parser.add_argument('reserve_choices', type=reserve_choice_type,
+            action='append')
+        self.parser.add_argument('rooms', type=room_type, action='append')
+        self.parser.add_argument('tags', type=tag_type, action='append')
 
     def get(self):
         args = self.parser.parse_args(request)
@@ -34,20 +77,10 @@ class ApartmentAPI(Resource):
 
     @oauth.require_oauth()
     def post(self):
-        # NOTE(huxuan): We may need validation for post data here.
-        args = request.get_json()
-        apartment = models.Apartment.create(
-            address=args['address'],
-            devices=args['devices'],
-            num_bedroom=args['num_bedroom'],
-            num_livingroom=args['num_livingroom'],
-            reserve_choices=args['reserve_choices'],
-            rooms=args['rooms'],
-            subtitle=args['subtitle'],
-            tags=args['tags'],
-            title=args['title'],
-            type=args['type'],
-        )
+        user = request.oauth.user
+        args = self.parser.parse_args(request)
+        args['username'] = user.username
+        apartment = models.Apartment.create(**args)
         return utils.api_response(payload=apartment.serialize())
 
 

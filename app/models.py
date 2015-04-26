@@ -570,7 +570,7 @@ class Apartment(db.Model):
     def create(cls, username, community_id, title="", subtitle="", address="",
         contract=None, num_bathroom=0, num_bedroom=0, num_livingroom=0,
         status=0, type=0, comments=[], devices=[], photos=[], rents=[],
-        reserve_choices=[], reserves=[], rooms=[], tags=[]):
+        reserve_choices=[], reserves=[], rooms=[], tags=[], **kwargs):
         apartment = cls(
             username=username,
             community_id=community_id,
