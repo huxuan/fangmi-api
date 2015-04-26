@@ -21,24 +21,26 @@ from app import db
 from app import utils
 
 schools_communities = db.Table('schools_communities',
-    db.Column('school_id', db.Integer, db.ForeignKey('school.id')),
-    db.Column('community_id', db.Integer, db.ForeignKey('community.id')),
+    db.Column('school_id', db.Integer, db.ForeignKey('schools.id')),
+    db.Column('community_id', db.Integer, db.ForeignKey('communities.id')),
 )
 
 
 apartments_tags = db.Table('apartments_tags',
-    db.Column('apartment_id', db.Integer, db.ForeignKey('apartment.id')),
-    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id')),
+    db.Column('apartment_id', db.Integer, db.ForeignKey('apartments.id')),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tags.id')),
 )
 
 
 users_fav_apartments = db.Table('users_fav_apartments',
-    db.Column('username', db.String(32), db.ForeignKey('user.username')),
-    db.Column('apartment_id', db.Integer, db.ForeignKey('apartment.id')),
+    db.Column('username', db.String(32), db.ForeignKey('users.username')),
+    db.Column('apartment_id', db.Integer, db.ForeignKey('apartments.id')),
 )
 
 
 class User(db.Model):
+    __tablename__ = 'users'
+
     # Authentication related.
     username = db.Column(db.String(32), primary_key=True)
     password_hash = db.Column(db.String(128), nullable=False)
@@ -244,6 +246,8 @@ class User(db.Model):
 
 
 class School(db.Model):
+    __tablename__ = 'schools'
+
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(32), nullable=False, unique=True, index=True)
@@ -329,6 +333,8 @@ class School(db.Model):
 
 
 class Community(db.Model):
+    __tablename__ = 'communities'
+
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(32), nullable=False, unique=True, index=True)
@@ -409,10 +415,12 @@ class Community(db.Model):
 
 
 class Apartment(db.Model):
+    __tablename__ = 'apartments'
+
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(db.String(32), db.ForeignKey('user.username'))
-    community_id = db.Column(db.Integer, db.ForeignKey('community.id'))
+    username = db.Column(db.String(32), db.ForeignKey('users.username'))
+    community_id = db.Column(db.Integer, db.ForeignKey('communities.id'))
 
     title = db.Column(db.String(64))
     subtitle = db.Column(db.String(64))
@@ -684,9 +692,11 @@ class Apartment(db.Model):
 
 
 class ReserveChoice(db.Model):
+    __tablename__ = 'reserve_choices'
+
     id = db.Column(db.Integer, primary_key=True)
 
-    apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
+    apartment_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
 
     date = db.Column(db.Date)
     time_start = db.Column(db.Time)
@@ -730,9 +740,11 @@ class ReserveChoice(db.Model):
 
 
 class Room(db.Model):
+    __tablename__ = 'rooms'
+
     id = db.Column(db.Integer, primary_key=True)
 
-    apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
+    apartment_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
 
     area = db.Column(db.Integer)
     name = db.Column(db.String(16), nullable=False)
@@ -779,9 +791,11 @@ class Room(db.Model):
 
 
 class Device(db.Model):
+    __tablename__ = 'devices'
+
     id = db.Column(db.Integer, primary_key=True)
 
-    apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
+    apartment_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
 
     name = db.Column(db.String(64), nullable=False, index=True)
     count = db.Column(db.Integer, default=1)
@@ -822,9 +836,11 @@ class Device(db.Model):
 
 
 class Photo(db.Model):
+    __tablename__ = 'photos'
+
     id = db.Column(db.Integer, primary_key=True)
 
-    apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
+    apartment_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
 
     photo_md5 = db.Column(db.String(32), nullable=False)
 
@@ -872,6 +888,8 @@ class Photo(db.Model):
 
 
 class Tag(db.Model):
+    __tablename__ = 'tags'
+
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String(64), nullable=False, unique=True, index=True)
@@ -915,6 +933,7 @@ class Tag(db.Model):
 
 
 class Rent(db.Model):
+    __tablename__ = 'rents'
     __table_args__ = (
         db.Index('ix_rent_username_apartment_id', 'username', 'apartment_id'),
         db.Index('ix_rent_username_apartment_id_deleted', 'username',
@@ -925,8 +944,8 @@ class Rent(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(db.String(32), db.ForeignKey('user.username'))
-    apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
+    username = db.Column(db.String(32), db.ForeignKey('users.username'))
+    apartment_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
 
     date_start = db.Column(db.Date)
     date_end = db.Column(db.Date)
@@ -999,6 +1018,7 @@ class Rent(db.Model):
 
 
 class Reserve(db.Model):
+    __tablename__ = 'reserves'
     __table_args__ = (
         db.Index('ix_reserve_username_apartment_id', 'username',
             'apartment_id'),
@@ -1010,9 +1030,9 @@ class Reserve(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(db.String(32), db.ForeignKey('user.username'))
-    apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
-    choice_id = db.Column(db.Integer, db.ForeignKey('reserve_choice.id'))
+    username = db.Column(db.String(32), db.ForeignKey('users.username'))
+    apartment_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
+    choice_id = db.Column(db.Integer, db.ForeignKey('reserve_choices.id'))
 
     cancelled = db.Column(db.Boolean, default=False)
 
@@ -1081,6 +1101,7 @@ class Reserve(db.Model):
 
 
 class Message(db.Model):
+    __tablename__ = 'messages'
     __table_args__ = (
         db.Index('ix_message_key_deleted', 'key', 'deleted'),
         db.Index('ix_message_key_to_username_unread', 'key', 'to_username',
@@ -1092,8 +1113,8 @@ class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     key = db.Column(db.String(64), nullable=False, index=True)
-    from_username = db.Column(db.String(32), db.ForeignKey('user.username'))
-    to_username = db.Column(db.String(32), db.ForeignKey('user.username'))
+    from_username = db.Column(db.String(32), db.ForeignKey('users.username'))
+    to_username = db.Column(db.String(32), db.ForeignKey('users.username'))
 
     type = db.Column(db.SmallInteger)
     content = db.Column(db.Text)
@@ -1175,10 +1196,12 @@ class Message(db.Model):
 
 
 class Comment(db.Model):
+    __tablename__ = 'comments'
+
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(db.String(32), db.ForeignKey('user.username'))
-    apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'))
+    username = db.Column(db.String(32), db.ForeignKey('users.username'))
+    apartment_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
 
     content = db.Column(db.Text)
     rate = db.Column(db.SmallInteger)
@@ -1246,6 +1269,8 @@ class Comment(db.Model):
 
 
 class Captcha(db.Model):
+    __tablename__ = 'captchas'
+
     id = db.Column(db.Integer, primary_key=True)
 
     mobile = db.Column(db.String(11), nullable=False, index=True)
@@ -1268,6 +1293,8 @@ class Captcha(db.Model):
 
 
 class Client(db.Model):
+    __tablename__ = 'clients'
+
     client_id = db.Column(db.String(64), primary_key=True)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
@@ -1305,14 +1332,15 @@ class Client(db.Model):
 
 
 class Token(db.Model):
+    __tablename__ = 'tokens'
     __table_args__ = (
         db.Index('ix_token_username_client_id', 'username', 'client_id'),
     )
 
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(db.String(32), db.ForeignKey('user.username'))
-    client_id = db.Column(db.String(64), db.ForeignKey('client.client_id'))
+    username = db.Column(db.String(32), db.ForeignKey('users.username'))
+    client_id = db.Column(db.String(64), db.ForeignKey('clients.client_id'))
 
     access_token = db.Column(db.String(255), unique=True, index=True)
     refresh_token = db.Column(db.String(255), unique=True, index=True)
