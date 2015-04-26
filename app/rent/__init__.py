@@ -35,6 +35,7 @@ class RentAPI(Resource):
     @oauth.require_oauth()
     def get(self):
         args = self.parser.parse_args(request)
+        utils.parser_required('rents', args, ['id'])
         rent = models.Rent.get(args['id'])
         rent.verify_owner(request.oauth.user.username)
         payload = dict(
@@ -46,6 +47,8 @@ class RentAPI(Resource):
     @oauth.require_oauth()
     def post(self):
         args = self.parser.parse_args(request)
+        utils.parser_required('rents', args,
+            ['apartment_id', 'date_start', 'date_end'])
         args['username'] = request.oauth.user.username
         rent = models.Rent.create(**args)
         payload = dict(
