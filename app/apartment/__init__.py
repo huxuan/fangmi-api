@@ -73,7 +73,10 @@ class ApartmentAPI(Resource):
     def get(self):
         args = self.parser.parse_args(request)
         apartment = models.Apartment.get(args['id'])
-        return utils.api_response(payload=apartment.serialize())
+        payload = dict(
+            apartment=apartment.serialize(),
+        )
+        return utils.api_response(payload=payload)
 
     @oauth.require_oauth()
     def post(self):
@@ -81,7 +84,10 @@ class ApartmentAPI(Resource):
         args = self.parser.parse_args(request)
         args['username'] = user.username
         apartment = models.Apartment.create(**args)
-        return utils.api_response(payload=apartment.serialize())
+        payload = dict(
+            apartment=apartment.serialize(),
+        )
+        return utils.api_response(payload=payload)
 
 
 class ApartmentPhotosAPI(Resource):
@@ -105,7 +111,10 @@ class ApartmentPhotosAPI(Resource):
         user = request.oauth.user
         if apartment.verify_owner(user.username):
             apartment.set(**args)
-        return utils.api_response(payload=apartment.serialize())
+        payload = dict(
+            apartment=apartment.serialize(),
+        )
+        return utils.api_response(payload=payload)
 
 
 class ApartmentListAPI(Resource):
