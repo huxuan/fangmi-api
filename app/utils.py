@@ -48,6 +48,7 @@ ARGUMENT_NAME = {
     'id_number': '身份证号',
     'json': 'Json 数据',
     'major': '专业',
+    'messages': '消息',
     'password': '密码',
     'pic_student': '学生证图片',
     'real_name': '姓名',

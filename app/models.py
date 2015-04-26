@@ -13,6 +13,7 @@ from datetime import timedelta
 from sqlalchemy import and_
 from sqlalchemy.ext.declarative import AbstractConcreteBase
 from sqlalchemy.ext.declarative import ConcreteBase
+from werkzeug import datastructures
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 
@@ -127,7 +128,7 @@ class User(db.Model):
     @property
     def num_unread_messages(self):
         return Message.query.filter_by(
-            to_username=username,
+            to_username=self.username,
             unread=True,
             deleted=False,
         ).count()
@@ -1122,11 +1123,27 @@ class Message(db.Model):
 
     @property
     def from_user(self):
-        return User.get(from_username).serialize()
+        return User.get(self.from_username).serialize()
 
     @property
     def to_user(self):
-        return User.get(to_username).serialize()
+        return User.get(self.to_username).serialize()
+
+    @property
+    def content_info(self):
+        if self.type == 1:
+            return self.content
+        elif self.type == 2:
+            return utils.get_url_from_md5(
+                app.config['UPLOAD_MESSAGE_URL'], self.content)
+
+    @content_info.setter
+    def content_info(self, content):
+        if self.type == 1:
+            self.content = content
+        elif self.type == 2:
+            self.content = utils.save_file(content,
+                app.config['UPLOAD_MESSAGE_FOLDER'])
 
     @classmethod
     def mark_as_read(cls, messages, username):
@@ -1136,14 +1153,14 @@ class Message(db.Model):
         db.session.flush()
 
     @classmethod
-    def create(cls, from_username, to_username, type, content, unread):
+    def create(cls, from_username, to_username, type, content):
         message = cls(
             key='_'.join(sorted([from_username, to_username])),
             from_username=from_username,
             to_username=to_username,
             type=type,
         )
-        message.content = content
+        message.content_info = content
         db.session.add(message)
         db.session.commit()
         return message
@@ -1156,22 +1173,22 @@ class Message(db.Model):
         res = res.first()
         if not nullable and not res:
             raise utils.APIException(utils.API_CODE_MESSAGE_NOT_FOUND)
-
+        return res
 
     @classmethod
-    def gets(cls, username, from_username, filter_unread=True,
-        filter_deleted=True):
-        key='_'.join(sorted([username, from_username])),
+    def gets(cls, to_username, from_username, filter_unread=True,
+        filter_deleted=True, **kwargs):
+        key='_'.join(sorted([to_username, from_username])),
         res = cls.query.filter_by(key=key)
         if filter_unread:
             res = res.filter(and_(
-                Message.to_username == username,
+                Message.to_username == to_username,
                 Message.unread == True,
             ))
         if filter_deleted:
             res = res.filter_by(deleted=False)
-        res = res.all()
-        cls.mark_as_read(res, username)
+        res = res.limit(100).all()
+        cls.mark_as_read(res, to_username)
         return res
 
     def set(self, **kwargs):
@@ -1180,12 +1197,17 @@ class Message(db.Model):
                 setattr(self, key, kwargs[key])
         db.session.flush()
 
+    def verify_owner(self, username):
+        if self.from_username != username and self.to_username != username:
+            raise utils.APIException(utils.API_CODE_NOT_AUTHORIZED,
+                name=self.__tablename__)
+
     def serialize(self):
         return dict(
             id=self.id,
-            from_user=self.from_user,
-            to_user=self.to_user,
-            content=self.content,
+            from_username=self.from_username,
+            to_username=self.to_username,
+            content=self.content_info,
             type=self.type,
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
