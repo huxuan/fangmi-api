@@ -119,7 +119,7 @@ class PasswordChangeAPI(Resource):
 class ApplyConfirmedAPI(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('name', required=True)
+        self.parser.add_argument('real_name', required=True)
         self.parser.add_argument('id_number', required=True)
 
     @oauth.require_oauth()
@@ -135,7 +135,7 @@ class ApplyConfirmedAPI(Resource):
 class ApplyStudentAPI(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('name', required=True)
+        self.parser.add_argument('real_name', required=True)
         self.parser.add_argument('id_number', required=True)
         self.parser.add_argument('school', required=True)
         self.parser.add_argument('major', required=True)

@@ -53,7 +53,7 @@ class User(db.Model):
     gender = db.Column(db.Boolean)
 
     # Personal Information.
-    name = db.Column(db.String(16))
+    real_name = db.Column(db.String(16))
     mobile = db.Column(db.String(11))
     id_number = db.Column(db.String(18))
     school = db.Column(db.String(32))
@@ -237,7 +237,7 @@ class User(db.Model):
             pic_student=self.pic_student,
             pic_portal=self.pic_portal,
             # Real name confirm information.
-            name=self.name,
+            real_name=self.real_name,
             id_number=self.id_number,
         )
         return res
