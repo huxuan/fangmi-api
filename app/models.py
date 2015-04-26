@@ -620,7 +620,6 @@ class Apartment(db.Model):
 
     def set(self, **kwargs):
         for key in kwargs:
-            print key
             if kwargs[key] is not None:
                 setattr(self, key, kwargs[key])
         db.session.flush()
