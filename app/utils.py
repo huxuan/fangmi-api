@@ -139,8 +139,10 @@ class Argument(reqparse.Argument):
 
 
 class RequestParser(reqparse.RequestParser):
-    def __init__(self):
-        super(RequestParser, self).__init__(argument_class=Argument)
+    def __init__(self, argument_class=Argument,
+        namespace_class=reqparse.Namespace):
+        super(RequestParser, self).__init__(argument_class=argument_class,
+            namespace_class=namespace_class)
 
 
 reqparse.RequestParser = RequestParser
