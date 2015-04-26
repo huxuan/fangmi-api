@@ -41,7 +41,7 @@ API_CODE_USER_NOT_AUTHORIZED = 9002
 API_CODE_USER_NOT_FOUND = 9003
 
 ARGUMENT_NAME = {
-    'apartment': '房屋',
+    'apartments': '房屋',
     'devices': '设备',
     'devices.count': '设备数量',
     'devices.name': '设备名称',
@@ -51,7 +51,7 @@ ARGUMENT_NAME = {
     'password': '密码',
     'pic_student': '学生证图片',
     'real_name': '姓名',
-    'rent': '租房记录',
+    'rents': '租房记录',
     'reserve_choices': '预约时间',
     'reserve_choices.date': '预约日期',
     'reserve_choices.time_end': '预约的结束时间',
@@ -61,7 +61,7 @@ ARGUMENT_NAME = {
     'rooms.date_entrance': '房间入住时间',
     'rooms.name': '房间名称',
     'rooms.price': '房间价格',
-    'school': '学校',
+    'schools': '学校',
     'student_id': '学号',
     'tags': '标签',
     'tags.name': '标签名称',
