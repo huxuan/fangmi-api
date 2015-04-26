@@ -34,6 +34,8 @@ DATE_FORMAT = '%Y-%m-%d'
 TIME_FORMAT = '%H:%M:%S'
 DATETIME_FORMAT = ' '.join([DATE_FORMAT, TIME_FORMAT])
 
+# The maximum content size when uploading.
+MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 # The maximun block size we read every time when processing file.
 BLOCKSIZE = 65536
 # The directory to store uploaded files.
