@@ -39,14 +39,20 @@ class AccountAPI(Resource):
     @oauth.require_oauth()
     def get(self):
         user = request.oauth.user
-        return utils.api_response(payload=user.serialize())
+        payload = dict(
+            user=user.serialize(),
+        )
+        return utils.api_response(payload=payload)
 
     @oauth.require_oauth()
     def post(self):
         args = self.parser.parse_args(request)
         user = request.oauth.user
         user.set(**args)
-        return utils.api_response(payload=user.serialize())
+        payload = dict(
+            user=user.serialize(),
+        )
+        return utils.api_response(payload=payload)
 
 
 class RegisterAPI(Resource):
@@ -63,7 +69,10 @@ class RegisterAPI(Resource):
         utils.check_password_confirm(args['password'], args['password_confirm'])
         models.User.check_not_exist(args['username'])
         user = models.User.create(args['username'], args['password'])
-        return utils.api_response(payload=user.serialize())
+        payload = dict(
+            user=user.serialize(),
+        )
+        return utils.api_response(payload=payload)
 
 
 class PasswordForgetAPI(Resource):
@@ -80,7 +89,10 @@ class PasswordForgetAPI(Resource):
         utils.check_password_confirm(args['password'], args['password_confirm'])
         user = models.User.get(args['username'])
         user.change_password(args['password'])
-        return utils.api_response()
+        payload = dict(
+            user=user.serialize(),
+        )
+        return utils.api_response(payload=payload)
 
 
 class PasswordChangeAPI(Resource):
@@ -98,7 +110,10 @@ class PasswordChangeAPI(Resource):
         user = request.oauth.user
         user.verify_password(args['password_old'])
         user.change_password(args['password_new'])
-        return utils.api_response()
+        payload = dict(
+            user=user.serialize(),
+        )
+        return utils.api_response(payload=payload)
 
 
 class ApplyConfirmedAPI(Resource):
@@ -112,7 +127,10 @@ class ApplyConfirmedAPI(Resource):
         args = self.parser.parse_args(request)
         user = request.oauth.user
         user.set(**args)
-        return utils.api_response(payload=user.serialize())
+        payload = dict(
+            user=user.serialize(),
+        )
+        return utils.api_response(payload=payload)
 
 class ApplyStudentAPI(Resource):
     def __init__(self):
@@ -131,7 +149,10 @@ class ApplyStudentAPI(Resource):
         args = self.parser.parse_args(request)
         user = request.oauth.user
         user.set(**args)
-        return utils.api_response(payload=user.serialize())
+        payload = dict(
+            user=user.serialize(),
+        )
+        return utils.api_response(payload=payload)
 
 
 api.add_resource(AccountAPI, '')
