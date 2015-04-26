@@ -1002,19 +1002,20 @@ class Rent(db.Model):
 class Reserve(db.Model):
     __tablename__ = 'reserves'
     __table_args__ = (
-        db.Index('ix_reserve_username_apartment_id', 'username',
-            'apartment_id'),
-        db.Index('ix_reserve_username_apartment_id_deleted', 'username',
-            'apartment_id', 'deleted'),
-        db.Index('ix_reserve_apartment_id_deleted', 'apartment_id', 'deleted'),
+        db.Index('ix_reserve_username_reserve_choice_id', 'username',
+            'reserve_choice_id'),
+        db.Index('ix_reserve_username_reserve_choice_id_deleted', 'username',
+            'reserve_choice_id', 'deleted'),
+        db.Index('ix_reserve_reserve_choice_id_deleted', 'reserve_choice_id',
+            'deleted'),
         db.Index('ix_reserve_username_deleted', 'username', 'deleted'),
     )
 
     id = db.Column(db.Integer, primary_key=True)
 
     username = db.Column(db.String(32), db.ForeignKey('users.username'))
-    apartment_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
-    choice_id = db.Column(db.Integer, db.ForeignKey('reserve_choices.id'))
+    reserve_choice_id = db.Column(db.Integer,
+        db.ForeignKey('reserve_choices.id'))
 
     cancelled = db.Column(db.Boolean, default=False)
 
@@ -1034,11 +1035,10 @@ class Reserve(db.Model):
         return self.reserve.serialize()
 
     @classmethod
-    def create(cls, username, apartment_id, choice_id):
+    def create(cls, username, reserve_choice_id):
         reserve = cls(
             username=username,
-            apartment_id=apartment_id,
-            choice_id=choice_id,
+            reserve_choice_id=reserve_choice_id,
         )
         db.session.add(reserve)
         db.session.commit()
@@ -1060,7 +1060,8 @@ class Reserve(db.Model):
         if username:
             res = res.filter_by(username=username)
         if apartment_id:
-            res = res.filter_by(apartment_id=apartment_id)
+            res = res.filter(
+                Reserve.reserve_choice.apartment_id == apartment_id)
         if filter_deleted:
             res = res.filter_by(deleted=False)
         res = res.all()
@@ -1071,6 +1072,13 @@ class Reserve(db.Model):
             if kwargs[key] is not None:
                 setattr(self, key, kwargs[key])
         db.session.flush()
+
+    def verify_owner(self, username):
+        if self.username != username and \
+            self.reserve_choice.apartment.username != username:
+            raise utils.APIException(utils.API_CODE_NOT_AUTHORIZED,
+                name=self.__tablename__)
+        return True
 
     def serialize(self):
         return dict(
