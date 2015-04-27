@@ -26,10 +26,6 @@ api = Api(message)
 
 
 def content_type(content):
-    print 'Content:', content
-    print type(content)
-    print isinstance(content, datastructures.FileStorage)
-
     if isinstance(content, datastructures.FileStorage):
         return content
     else:
@@ -61,12 +57,10 @@ class MessageAPI(Resource):
         parser.add_argument('content', type=content_type,
             location=('files', 'json', 'values'))
         args = parser.parse_args(request)
-        print args
         args['from_username'] = request.oauth.user.username
         message = models.Message.create(**args)
-        messages = models.Message.gets(**args)
         payload = dict(
-            messages=[message.serialize() for message in messages],
+            messages=[message.serialize()],
         )
         return utils.api_response(payload=payload)
 
@@ -79,7 +73,7 @@ class ListAPI(Resource):
     def get(self):
         parser = self.parser.copy()
         parser.add_argument('from_username', required=True)
-        parser.add_argument('filter_unread', type=inputs.boolean)
+        parser.add_argument('filter_unread', type=inputs.boolean, default=True)
         args = parser.parse_args(request)
         args['to_username'] = request.oauth.user.username
         messages = models.Message.gets(**args)

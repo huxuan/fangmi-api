@@ -1209,6 +1209,7 @@ class Message(db.Model):
             to_username=self.to_username,
             content=self.content_info,
             type=self.type,
+            unread=self.unread,
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
         )
