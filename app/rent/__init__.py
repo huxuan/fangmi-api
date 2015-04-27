@@ -44,7 +44,7 @@ class RentAPI(Resource):
     @oauth.require_oauth()
     def post(self):
         parser = self.parser.copy()
-        parser.add_argument('apartment_id', type=int, required=True)
+        parser.add_argument('room_id', type=int, required=True)
         parser.add_argument('date_start', type=utils.strpdate, required=True)
         parser.add_argument('date_end', type=utils.strpdate, required=True)
         args = parser.parse_args(request)

@@ -433,7 +433,6 @@ class Apartment(db.Model):
     num_bathroom = db.Column(db.SmallInteger)
     num_bedroom = db.Column(db.SmallInteger)
     num_livingroom = db.Column(db.SmallInteger)
-    status = db.Column(db.SmallInteger)
     type = db.Column(db.SmallInteger)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
@@ -588,8 +587,8 @@ class Apartment(db.Model):
     @classmethod
     def create(cls, username, community_id, title="", subtitle="", address="",
         contract=None, num_bathroom=0, num_bedroom=0, num_livingroom=0,
-        status=0, type=0, comments=[], devices=[], photos=[],
-        reserve_choices=[], rooms=[], tags=[], **kwargs):
+        type=0, comments=[], devices=[], photos=[], reserve_choices=[],
+        rooms=[], tags=[]):
         apartment = cls(
             username=username,
             community_id=community_id,
@@ -600,7 +599,6 @@ class Apartment(db.Model):
             num_bathroom=num_bathroom,
             num_bedroom=num_bedroom,
             num_livingroom=num_livingroom,
-            status=status,
             type=type,
             comments=comments,
             devices=devices,
@@ -662,7 +660,6 @@ class Apartment(db.Model):
             num_fav_users=self.num_fav_users,
             min_price=self.min_price,
             max_price=self.max_price,
-            status=self.status,
             type=self.type,
             comments=self.comments,
             devices=self.devices,
@@ -760,9 +757,18 @@ class Room(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
 
+    rent_list = db.relationship('Rent', backref='room', lazy='dynamic')
+
     @property
     def apartment_info(self):
         return self.apartment.serialize()
+
+    @property
+    def status(self):
+        for rent in self.rent_list:
+            if rent.date_start <= date.today() and date.today() < rent.date_end:
+                return False
+        return True
 
     @classmethod
     def create(cls, apartment_id, name, area, price, date_entrance):
@@ -790,6 +796,7 @@ class Room(db.Model):
             area=self.area,
             name=self.name,
             price=self.price,
+            status=self.status,
             date_entrance=self.date_entrance.isoformat(),
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
@@ -952,6 +959,7 @@ class Rent(db.Model):
 
     username = db.Column(db.String(32), db.ForeignKey('users.username'))
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
+    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'))
 
     date_start = db.Column(db.Date)
     date_end = db.Column(db.Date)
@@ -968,10 +976,12 @@ class Rent(db.Model):
         return self.apartment.serialize()
 
     @classmethod
-    def create(cls, username, apartment_id, date_start, date_end, **kwargs):
+    def create(cls, username, room_id, date_start, date_end, **kwargs):
+        room = Room.get(room_id)
         rent = cls(
             username=username,
-            apartment_id=apartment_id,
+            apartment_id=room.apartment_id,
+            room_id = room_id,
             date_start=date_start,
             date_end=date_end,
         )
