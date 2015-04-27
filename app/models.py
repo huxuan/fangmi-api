@@ -915,7 +915,7 @@ class Tag(db.Model):
         return dict(
             id=self.id,
             name=self.name,
-            apartments=self.apartments,
+            #apartments=self.apartments,
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
         )
