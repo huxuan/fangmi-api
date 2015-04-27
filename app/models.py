@@ -79,7 +79,7 @@ class User(db.Model):
 
     fav_apartment_list = db.relationship('Apartment',
         secondary=users_fav_apartments,
-        backref=db.backref('users', lazy='dynamic'),
+        backref=db.backref('fav_users', lazy='dynamic'),
         lazy='dynamic',
     )
 
@@ -202,9 +202,11 @@ class User(db.Model):
 
     def append_fav_apartment(self, apartment):
         self.fav_apartment_list.append(apartment)
+        db.session.commit()
 
     def remove_fav_apartment(self, apartment):
         self.fav_apartment_list.remove(apartment)
+        db.session.commit()
 
     def fav_apartment_action(self, apartment_id, action):
         apartment = Apartment.get(apartment_id)
@@ -571,6 +573,18 @@ class Apartment(db.Model):
             self.tag_list.append(tag_item)
         db.session.commit()
 
+    @property
+    def num_fav_users(self):
+        return self.fav_users.count()
+
+    @property
+    def min_price(self):
+        return min([room.price for room in self.room_list])
+
+    @property
+    def max_price(self):
+        return max([room.price for room in self.room_list])
+
     @classmethod
     def create(cls, username, community_id, title="", subtitle="", address="",
         contract=None, num_bathroom=0, num_bedroom=0, num_livingroom=0,
@@ -645,6 +659,9 @@ class Apartment(db.Model):
             num_bathroom=self.num_bathroom,
             num_bedroom=self.num_bedroom,
             num_livingroom=self.num_livingroom,
+            num_fav_users=self.num_fav_users,
+            min_price=self.min_price,
+            max_price=self.max_price,
             status=self.status,
             type=self.type,
             comments=self.comments,
