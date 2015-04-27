@@ -148,6 +148,7 @@ class ListAPI(Resource):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('username')
         self.parser.add_argument('community_id', type=int)
+        self.parser.add_argument('school_id', type=int)
 
     def get(self):
         args = self.parser.parse_args(request)

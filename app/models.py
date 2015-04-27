@@ -21,6 +21,7 @@ from app import app
 from app import db
 from app import utils
 
+
 schools_communities = db.Table('schools_communities',
     db.Column('school_id', db.Integer, db.ForeignKey('schools.id')),
     db.Column('community_id', db.Integer, db.ForeignKey('communities.id')),
@@ -309,8 +310,8 @@ class School(db.Model):
         return school
 
     @classmethod
-    def get(cls, name, filter_deleted=True, nullable=False):
-        res = cls.query.filter_by(name=name)
+    def get(cls, id, filter_deleted=True, nullable=False):
+        res = cls.query.filter_by(id=id)
         if filter_deleted:
             res = res.filter_by(deleted=False)
         res = res.first()
@@ -622,12 +623,18 @@ class Apartment(db.Model):
         return res
 
     @classmethod
-    def gets(cls, username=None, community_id=None, filter_deleted=True):
+    def gets(cls, username=None, community_id=None, school_id=None,
+        filter_deleted=True):
         res = cls.query
         if username:
             res = res.filter_by(username=username)
         if community_id:
             res = res.filter_by(community_id=community_id)
+        if school_id:
+            school = School.get(school_id)
+            community_ids = [community.id
+                for community in school.community_list]
+            res = res.filter(Apartment.community_id.in_(community_ids))
         if filter_deleted:
             res = res.filter_by(deleted=False)
         res = res.all()
