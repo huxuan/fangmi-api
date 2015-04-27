@@ -26,6 +26,7 @@ class Fake(object):
         self.fake_community()
         self.fake_school_community()
         self.fake_apartment()
+        self.fake_user_fav_apartment()
 
     def fake_client(self):
         self.clients = [
@@ -91,8 +92,8 @@ class Fake(object):
                     app.config['UPLOAD_AVATAR_FOLDER'],
                     app.config['DEFAULT_AVATAR_MD5'],
                 )), comments=[
-                    {'username': 'u1', 'content': 'content1', 'rate': 5},
-                    {'username': 'u3', 'content': 'content2', 'rate': 1},
+                    #{'username': 'u1', 'content': 'content1', 'rate': 5},
+                    #{'username': 'u3', 'content': 'content2', 'rate': 1},
                 ], devices=[
                     {'name': 'name1', 'count': 1},
                     {'name': 'name2', 'count': 3},
@@ -107,11 +108,6 @@ class Fake(object):
                         app.config['UPLOAD_AVATAR_FOLDER'],
                         app.config['DEFAULT_AVATAR_MD5'],
                     )),
-                ], rents=[
-                    {'username': 'u4', 'date_start': date(2013, 03, 28),
-                        'date_end': date(2014, 04, 01)},
-                    {'username': 'u4', 'date_start': date(2013, 04, 28),
-                        'date_end': date(2015, 07, 26)},
                 ], reserve_choices=[
                     {'date': date(1950, 10, 01), 'time_start': time(12, 34, 56),
                         'time_end': time(12, 56, 34)},
@@ -119,10 +115,58 @@ class Fake(object):
                         'time_end': time(12, 56, 34)},
                 ], reserves=[
                 ], rooms=[
-                    {'name': '主卧', 'area': 88, 'price': 8888,
+                    {'name': '', 'area': 88, 'price': 8888,
                         'date_entrance': date(1949, 10, 01)},
-                    {'name': '次卧1', 'area': 66, 'price': 6666,
-                        'date_entrance': date(1950, 10, 01)},
+                ], tags=[
+                    {'name': '标签1'},
+                    {'name': '标签2'},
+                    {'name': '标签3'},
+                ],
+            ),
+            models.Apartment.create(
+                self.users[0].username,
+                self.communities[1].id,
+                title='title1',
+                subtitle='subtitle1',
+                address='address1',
+                num_bedroom=3,
+                num_livingroom=1,
+                type=1,
+                contract=file(utils.get_path_from_md5(
+                    app.config['UPLOAD_AVATAR_FOLDER'],
+                    app.config['DEFAULT_AVATAR_MD5'],
+                )), comments=[
+                ], devices=[
+                    {'name': 'name1', 'count': 1},
+                    {'name': 'name2', 'count': 3},
+                    {'name': 'test_for_no_count'},
+                    {'name': 'test_for_none_count', 'count': None},
+                ], photos=[
+                    file(utils.get_path_from_md5(
+                        app.config['UPLOAD_AVATAR_FOLDER'],
+                        app.config['DEFAULT_AVATAR_MD5'],
+                    )),
+                    file(utils.get_path_from_md5(
+                        app.config['UPLOAD_AVATAR_FOLDER'],
+                        app.config['DEFAULT_AVATAR_MD5'],
+                    )),
+                ], reserve_choices=[
+                    {'date': date(1950, 10, 01), 'time_start': time(12, 34, 56),
+                        'time_end': time(12, 56, 34)},
+                    {'date': date(1951, 10, 01), 'time_start': time(12, 34, 56),
+                        'time_end': time(12, 56, 34)},
+                ], reserves=[
+                ], rooms=[
+                    {'name': '', 'area': 88, 'price': 1111,
+                        'date_entrance': date(1949, 10, 01)},
+                    {'name': '', 'area': 88, 'price': 2222,
+                        'date_entrance': date(1949, 10, 01)},
+                    {'name': '', 'area': 88, 'price': 3333,
+                        'date_entrance': date(1949, 10, 01)},
+                    {'name': '', 'area': 88, 'price': 4444,
+                        'date_entrance': date(1949, 10, 01)},
+                    {'name': '', 'area': 88, 'price': 5555,
+                        'date_entrance': date(1949, 10, 01)},
                 ], tags=[
                     {'name': '标签1'},
                     {'name': '标签2'},
@@ -139,6 +183,11 @@ class Fake(object):
                 'choice_id':self.apartments[0].reserve_choice_list[1].id,
             },
         ]
+
+    def fake_user_fav_apartment(self):
+        self.users[0].append_fav_apartment(self.apartments[0])
+        self.users[2].append_fav_apartment(self.apartments[0])
+
 
 def main():
     fake = Fake()
