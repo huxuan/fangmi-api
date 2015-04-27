@@ -56,23 +56,12 @@ def tag_type(tag, name):
 class ApartmentAPI(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument('id', type=int, default=None)
-        self.parser.add_argument('community_id', type=int)
-        self.parser.add_argument('title')
-        self.parser.add_argument('subtitle')
-        self.parser.add_argument('address')
-        self.parser.add_argument('num_bedroom', type=int)
-        self.parser.add_argument('num_livingroom', type=int)
-        self.parser.add_argument('type', type=int)
-        self.parser.add_argument('devices', type=device_type, action='append')
-        self.parser.add_argument('reserve_choices', type=reserve_choice_type,
-            action='append')
-        self.parser.add_argument('rooms', type=room_type, action='append')
-        self.parser.add_argument('tags', type=tag_type, action='append')
 
     def get(self):
+        parser = self.parser.copy()
+        parser.add_argument('id', type=int, required=True)
         args = self.parser.parse_args(request)
-        apartment = models.Apartment.get(args['id'])
+        apartment = models.Apartment.get(**args)
         payload = dict(
             apartment=apartment.serialize(),
         )
@@ -80,9 +69,23 @@ class ApartmentAPI(Resource):
 
     @oauth.require_oauth()
     def post(self):
-        user = request.oauth.user
-        args = self.parser.parse_args(request)
-        args['username'] = user.username
+        parser = self.parser.copy()
+        parser.add_argument('community_id', type=int, required=True)
+        parser.add_argument('title', required=True)
+        parser.add_argument('subtitle', required=True)
+        parser.add_argument('address', required=True)
+        parser.add_argument('num_bedroom', type=int, required=True)
+        parser.add_argument('num_livingroom', type=int, required=True)
+        parser.add_argument('type', type=int, required=True)
+        parser.add_argument('devices', type=device_type, action='append',
+            required=True)
+        parser.add_argument('reserve_choices', type=reserve_choice_type,
+            action='append', required=True)
+        parser.add_argument('rooms', type=room_type, action='append',
+            required=True)
+        parser.add_argument('tags', type=tag_type, action='append')
+        args = parser.parse_args(request)
+        args['username'] = request.oauth.user.username
         apartment = models.Apartment.create(**args)
         payload = dict(
             apartment=apartment.serialize(),

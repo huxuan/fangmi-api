@@ -587,23 +587,19 @@ class Apartment(db.Model):
 
     @classmethod
     def create(cls, username, community_id, title="", subtitle="", address="",
-        contract=None, num_bathroom=0, num_bedroom=0, num_livingroom=0,
-        type=0, comments=[], devices=[], photos=[], reserve_choices=[],
-        rooms=[], tags=[]):
+        num_bathroom=0, num_bedroom=0, num_livingroom=0, type=0, devices=[],
+        reserve_choices=[], rooms=[], tags=[]):
         apartment = cls(
             username=username,
             community_id=community_id,
             title=title,
             subtitle=subtitle,
             address=address,
-            contract=contract,
             num_bathroom=num_bathroom,
             num_bedroom=num_bedroom,
             num_livingroom=num_livingroom,
             type=type,
-            comments=comments,
             devices=devices,
-            photos=photos,
             reserve_choices=reserve_choices,
             rooms=rooms,
             tags=tags,
