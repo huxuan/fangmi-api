@@ -652,6 +652,7 @@ class Apartment(db.Model):
             photos=self.photos,
             reserve_choices=self.reserve_choices,
             rooms=self.rooms,
+            tags=self.tags,
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
         )
