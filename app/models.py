@@ -328,7 +328,7 @@ class School(db.Model):
             name=self.name,
             avatar=self.avatar,
             image=self.image,
-            communities=self.communities,
+            #communities=self.communities,
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
         )
@@ -409,7 +409,7 @@ class Community(db.Model):
             address=self.address,
             traffic=self.traffic,
             map=self.map,
-            #schools=self.schools,
+            schools=self.schools,
             #apartments=self.apartments,
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
