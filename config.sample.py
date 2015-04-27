@@ -93,3 +93,9 @@ UPLOAD_PHOTO_FOLDER = os.path.realpath(os.path.join(
     UPLOAD_FOLDER,
     UPLOAD_PHOTO_DIR,
 ))
+UPLOAD_MESSAGE_DIR = 'messages'
+UPLOAD_MESSAGE_URL = os.path.join(UPLOAD_URL, UPLOAD_MESSAGE_DIR)
+UPLOAD_MESSAGE_FOLDER = os.path.realpath(os.path.join(
+    UPLOAD_FOLDER,
+    UPLOAD_MESSAGE_DIR,
+))
