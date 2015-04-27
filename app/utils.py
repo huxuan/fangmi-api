@@ -45,6 +45,7 @@ ARGUMENT_NAME = {
     'devices': '设备',
     'devices.count': '设备数量',
     'devices.name': '设备名称',
+    'file': '文件',
     'id_number': '身份证号',
     'json': 'Json 数据',
     'major': '专业',

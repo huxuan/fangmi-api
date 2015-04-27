@@ -6,6 +6,8 @@ Author: huxuan
 Email: i(at)huxuan.org
 Description: Uploads related API.
 """
+import os.path
+
 from flask import Blueprint
 from flask import request
 from flask import safe_join
@@ -26,7 +28,10 @@ api = Api(uploads)
 class UploadsAPI(Resource):
     def get(self, file_path):
         file_path = safe_join(app.config['UPLOAD_FOLDER'], file_path)
-        return send_file(file_path)
+        if os.path.isfile(file_path):
+            return send_file(file_path)
+        else:
+            raise utils.APIException(utils.API_CODE_NOT_FOUND, name='file')
 
 
 api.add_resource(UploadsAPI, '/<path:file_path>')
