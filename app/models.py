@@ -1026,13 +1026,13 @@ class Rent(db.Model):
 class Reserve(db.Model):
     __tablename__ = 'reserves'
     __table_args__ = (
-        db.Index('ix_reserve_username_reserve_choice_id', 'username',
-            'reserve_choice_id'),
-        db.Index('ix_reserve_username_reserve_choice_id_deleted', 'username',
-            'reserve_choice_id', 'deleted'),
-        db.Index('ix_reserve_reserve_choice_id_deleted', 'reserve_choice_id',
-            'deleted'),
         db.Index('ix_reserve_username_deleted', 'username', 'deleted'),
+        db.Index('ix_reserve_username_apartment_id', 'username',
+            'apartment_id'),
+        db.Index('ix_reserve_username_apartment_id_deleted', 'username',
+            'apartment_id', 'deleted'),
+        db.Index('ix_reserve_apartment_id_deleted', 'apartment_id',
+            'deleted'),
     )
 
     id = db.Column(db.Integer, primary_key=True)
