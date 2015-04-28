@@ -1069,8 +1069,8 @@ class Reserve(db.Model):
         return self.apartment.serialize()
 
     @property
-    def reserve(self):
-        return self.reserve.serialize()
+    def reserve_choice_info(self):
+        return self.reserve_choice.serialize()
 
     @classmethod
     def create(cls, username, reserve_choice_id):
@@ -1123,6 +1123,7 @@ class Reserve(db.Model):
         return dict(
             id=self.id,
             user=self.user_info,
+            reserve_choice=self.reserve_choice_info,
             #apartment=self.apartment_info,
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
