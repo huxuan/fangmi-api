@@ -1018,6 +1018,10 @@ class Rent(db.Model):
     def apartment_info(self):
         return self.apartment.serialize()
 
+    @property
+    def room_info(self):
+        return self.room.serialize()
+
     @classmethod
     def create(cls, username, room_id, date_start, date_end, **kwargs):
         room = Room.get(room_id)
@@ -1069,6 +1073,7 @@ class Rent(db.Model):
             id=self.id,
             user=self.user_info,
             #apartment=self.apartment_info,
+            room=self.room_info,
             date_start=self.date_start.isoformat(),
             date_end=self.date_end.isoformat(),
             created_at=self.created_at.isoformat(),
