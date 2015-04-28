@@ -139,14 +139,8 @@ class User(db.Model):
         return [apartment.serialize() for apartment in self.fav_apartment_list]
 
     @fav_apartments.setter
-    def fav_apartments(self, apartments):
-        for apartment in apartments:
-            self.apartment_list.append(apartment)
-
-    @fav_apartments.deleter
-    def fav_apartments(self):
-        for apartment in self.apartment_list:
-            self.apartment_list.remove(apartment)
+    def fav_apartments(self, fav_apartments):
+        self.fav_apartment_list = fav_apartments
 
     @property
     def birthday_info(self):
@@ -202,18 +196,20 @@ class User(db.Model):
             raise utils.APIException(utils.API_CODE_PASSWORD_INVALID)
 
     def append_fav_apartment(self, apartment):
-        self.fav_apartment_list.append(apartment)
+        if not self.is_fav_apartment(apartment.id):
+            self.fav_apartment_list.append(apartment)
         db.session.commit()
 
     def remove_fav_apartment(self, apartment):
-        self.fav_apartment_list.remove(apartment)
+        if self.is_fav_apartment(apartment.id):
+            self.fav_apartment_list.remove(apartment)
         db.session.commit()
 
     def fav_apartment_action(self, apartment_id, action):
         apartment = Apartment.get(apartment_id)
-        if action == 'append' and not self.is_fav_apartment(apartment_id):
+        if action == 'append':
             self.append_fav_apartment(apartment)
-        elif action == 'remove' and self.is_fav_apartment(apartment_id):
+        elif action == 'remove':
             self.remove_fav_apartment(apartment)
 
     def is_fav_apartment(self, apartment_id):
@@ -294,8 +290,7 @@ class School(db.Model):
 
     @communities.setter
     def communities(self, communities):
-        for community in communities:
-            self.community_list.append(community)
+        self.community_list = communities
         db.session.commit()
 
     @classmethod
@@ -324,6 +319,27 @@ class School(db.Model):
             if kwargs[key] is not None:
                 setattr(self, key, kwargs[key])
         db.session.flush()
+
+    def append_community(self, community):
+        if not self.has_community(community.id):
+            self.community_list.append(community)
+        db.session.commit()
+
+    def remove_community(self, community):
+        if self.has_community(community.id):
+            self.community_list.remove(community)
+        db.session.commit()
+
+    def community_action(self, community_id, action):
+        community = Community.get(community_id)
+        if action == 'append':
+            self.append_community(community)
+        elif action == 'remove':
+            self.remove_community(community)
+
+    def has_community(self, community_id):
+        return self.community_list.filter(
+            schools_communities.c.community_id == community_id).count() > 0
 
     def serialize(self):
         return dict(
@@ -369,8 +385,7 @@ class Community(db.Model):
 
     @schools.setter
     def schools(self, schools):
-        for school in schools:
-            self.school_list.append(school)
+        self.school_list = schools
         db.session.commit()
 
     @property
@@ -404,6 +419,27 @@ class Community(db.Model):
             if kwargs[key] is not None:
                 setattr(self, key, kwargs[key])
         db.session.flush()
+
+    def append_school(self, school):
+        if not self.has_school(school.id):
+            self.school_list.append(school)
+        db.session.commit()
+
+    def remove_school(self, school):
+        if self.has_school(school.id):
+            self.school_list.remove(school)
+        db.session.commit()
+
+    def school_action(self, school_id, action):
+        school = School.get(school_id)
+        if action == 'append':
+            self.append_school(school)
+        elif action == 'remove':
+            self.remove_school(school)
+
+    def has_school(self, school_id):
+        return self.school_list.filter(
+            schools_communities.c.school_id == school_id).count() > 0
 
     def serialize(self):
         return dict(
@@ -487,14 +523,13 @@ class Apartment(db.Model):
 
     @comments.setter
     def comments(self, comments):
-        for comment in comments:
-            comment_item = Comment.create(
+        self.comment_list = [
+            Comment.create(
                 comment['username'],
                 self.id,
                 comment['content'],
                 comment['rate'],
-            )
-            self.comment_list.append(comment_item)
+            ) for comment in comments]
         db.session.commit()
 
     @property
@@ -503,13 +538,12 @@ class Apartment(db.Model):
 
     @devices.setter
     def devices(self, devices):
-        for device in devices:
-            device_item = Device.create(
+        self.device_list = [
+            Device.create(
                 self.id,
                 device['name'],
                 device.get('count', None),
-            )
-            self.device_list.append(device_item)
+            ) for device in devices]
         db.session.commit()
 
     @property
@@ -518,12 +552,11 @@ class Apartment(db.Model):
 
     @photos.setter
     def photos(self, photos):
-        for photo in photos:
-            photo_item = Photo.create(
+        self.photo_list = [
+            Photo.create(
                 self.id,
                 photo,
-            )
-            self.photo_list.append(photo_item)
+            ) for photo in photos]
         db.session.commit()
 
     @property
@@ -533,14 +566,13 @@ class Apartment(db.Model):
 
     @reserve_choices.setter
     def reserve_choices(self, reserve_choices):
-        for reserve_choice in reserve_choices:
-            reserve_choice_item = ReserveChoice.create(
+        self.reserve_choice_list = [
+            ReserveChoice.create(
                 self.id,
                 reserve_choice['date'],
                 reserve_choice['time_start'],
                 reserve_choice['time_end'],
-            )
-            self.reserve_choice_list.append(reserve_choice_item)
+            ) for reserve_choice in reserve_choices]
         db.session.commit()
 
     @property
@@ -549,15 +581,14 @@ class Apartment(db.Model):
 
     @rooms.setter
     def rooms(self, rooms):
-        for room in rooms:
-            room_item = Room.create(
+        self.room_list = [
+            Room.create(
                 self.id,
                 room['name'],
                 room['area'],
                 room['price'],
                 room['date_entrance'],
-            )
-            self.room_list.append(room_item)
+            ) for room in rooms]
         db.session.commit()
 
     @property
@@ -566,11 +597,10 @@ class Apartment(db.Model):
 
     @tags.setter
     def tags(self, tags):
-        for tag in tags:
-            tag_item = Tag.create(
+        self.tag_list = [
+            Tag.create(
                 tag['name'],
-            )
-            self.tag_list.append(tag_item)
+            ) for tag in tags]
         db.session.commit()
 
     @property
