@@ -73,13 +73,6 @@ class Fake(object):
         self.schools[2].communities = self.communities[:3]
         self.schools[3].communities = self.communities[2:]
 
-    def fake_comments(self):
-        pass
-
-    def fake_reserve_choice(self):
-        self.reserve_choices = [
-        ]
-
     def fake_apartment(self):
         self.apartments = [
             models.Apartment.create(
@@ -191,23 +184,23 @@ class Fake(object):
         ))
 
     def fake_apartment_reserve(self):
-        self.apartments[0].reserves = [
-            {
-                'username': 'u2',
-                'choice_id':self.apartments[0].reserve_choice_list[0].id,
-            }, {
-                'username': 'u2',
-                'choice_id':self.apartments[0].reserve_choice_list[1].id,
-            },
-        ]
-        self.apartments[1].reserves = [
-            {
-                'username': 'u1',
-                'choice_id':self.apartments[1].reserve_choice_list[0].id,
-            }, {
-                'username': 'u3',
-                'choice_id':self.apartments[1].reserve_choice_list[1].id,
-            },
+        self.reserves = [
+            models.Reserve.create(
+                self.users[1].username,
+                self.apartments[0].reserve_choice_list[0].id,
+            ),
+            models.Reserve.create(
+                self.users[2].username,
+                self.apartments[0].reserve_choice_list[1].id,
+            ),
+            models.Reserve.create(
+                self.users[3].username,
+                self.apartments[1].reserve_choice_list[0].id,
+            ),
+            models.Reserve.create(
+                self.users[0].username,
+                self.apartments[1].reserve_choice_list[1].id,
+            ),
         ]
 
     def fake_apartment_rent(self):
