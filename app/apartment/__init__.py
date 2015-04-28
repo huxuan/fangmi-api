@@ -131,7 +131,7 @@ class FavoriteAPI(Resource):
     def get(self):
         user = request.oauth.user
         payload = dict(
-            aparments=user.fav_apartments,
+            apartments=user.fav_apartments,
         )
         return utils.api_response(payload=payload)
 
@@ -141,7 +141,7 @@ class FavoriteAPI(Resource):
         user = request.oauth.user
         user.fav_apartment_action(args['id'], args['action'])
         payload = dict(
-            aparments=user.fav_apartments,
+            apartments=user.fav_apartments,
         )
         return utils.api_response(payload=payload)
 
