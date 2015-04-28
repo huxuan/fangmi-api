@@ -68,6 +68,30 @@ class ApartmentAPI(Resource):
         return utils.api_response(payload=payload)
 
     @oauth.require_oauth()
+    def put(self):
+        parser = self.parser.copy()
+        parser.add_argument('id', type=int)
+        parser.add_argument('title')
+        parser.add_argument('subtitle')
+        parser.add_argument('address')
+        parser.add_argument('num_bedroom', type=int)
+        parser.add_argument('num_livingroom', type=int)
+        parser.add_argument('type', type=int)
+        parser.add_argument('devices', type=device_type, action='append')
+        parser.add_argument('reserve_choices', type=reserve_choice_type,
+            action='append')
+        parser.add_argument('rooms', type=room_type, action='append')
+        parser.add_argument('tags', type=tag_type, action='append')
+        args = parser.parse_args(request)
+        apartment = models.Apartment.get(args['id'])
+        apartment.verify_owner(request.oauth.user.username)
+        apartment.set(**args)
+        payload = dict(
+            apartment=apartment.serialize(),
+        )
+        return utils.api_response(payload=payload)
+
+    @oauth.require_oauth()
     def post(self):
         parser = self.parser.copy()
         parser.add_argument('community_id', type=int, required=True)
