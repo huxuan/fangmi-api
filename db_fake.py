@@ -88,15 +88,13 @@ class Fake(object):
                 num_bedroom=3,
                 num_livingroom=1,
                 type=0,
-                contract=file(utils.get_path_from_md5(
-                    app.config['UPLOAD_AVATAR_FOLDER'],
-                    app.config['DEFAULT_AVATAR_MD5'],
-                )), devices=[
+                devices=[
                     {'name': 'name1', 'count': 1},
                     {'name': 'name2', 'count': 3},
                     {'name': 'test_for_no_count'},
                     {'name': 'test_for_none_count', 'count': None},
-                ], photos=[
+                ],
+                photos=[
                     file(utils.get_path_from_md5(
                         app.config['UPLOAD_AVATAR_FOLDER'],
                         app.config['DEFAULT_AVATAR_MD5'],
@@ -105,15 +103,18 @@ class Fake(object):
                         app.config['UPLOAD_AVATAR_FOLDER'],
                         app.config['DEFAULT_AVATAR_MD5'],
                     )),
-                ], reserve_choices=[
+                ],
+                reserve_choices=[
                     {'date': date(1950, 10, 01), 'time_start': time(12, 34, 56),
                         'time_end': time(12, 56, 34)},
                     {'date': date(1951, 10, 01), 'time_start': time(12, 34, 56),
                         'time_end': time(12, 56, 34)},
-                ], rooms=[
+                ],
+                rooms=[
                     {'name': '', 'area': 88, 'price': 8888,
                         'date_entrance': date(1949, 10, 01)},
-                ], tags=[
+                ],
+                tags=[
                     {'name': '标签1'},
                     {'name': '标签2'},
                     {'name': '标签3'},
