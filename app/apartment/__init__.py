@@ -76,7 +76,7 @@ class ApartmentAPI(Resource):
         parser.add_argument('address', required=True)
         parser.add_argument('num_bedroom', type=int, required=True)
         parser.add_argument('num_livingroom', type=int, required=True)
-        parser.add_argument('type', type=int, required=True)
+        parser.add_argument('type', type=int)
         parser.add_argument('devices', type=device_type, action='append',
             required=True)
         parser.add_argument('reserve_choices', type=reserve_choice_type,
