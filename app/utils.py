@@ -58,6 +58,7 @@ ARGUMENT_NAME = {
     'reserve_choices.date': '预约日期',
     'reserve_choices.time_end': '预约的结束时间',
     'reserve_choices.time_start': '预约的开始时间',
+    'reserves': '预约记录',
     'rooms': '房间',
     'rooms.area': '房间面积',
     'rooms.date_entrance': '房间入住时间',
