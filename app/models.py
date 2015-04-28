@@ -746,7 +746,7 @@ class ReserveChoice(db.Model):
         res = res.first()
         if not nullable and not res:
             raise utils.APIException(utils.API_CODE_NOT_FOUND,
-                name=self.__tablename__)
+                name=cls.__tablename__)
         return res
 
     @classmethod
