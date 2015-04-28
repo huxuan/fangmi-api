@@ -816,6 +816,16 @@ class Room(db.Model):
         db.session.commit()
         return room
 
+    @classmethod
+    def get(cls, id, filter_deleted=True, nullable=False):
+        res = cls.query.filter_by(id=id)
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        res = res.first()
+        if not nullable and not res:
+            raise utils.APIException(utils.API_CODE_NOT_FOUND,
+                name=cls.__tablename__)
+
     def set(self, **kwargs):
         for key in kwargs:
             if kwargs[key] is not None:
