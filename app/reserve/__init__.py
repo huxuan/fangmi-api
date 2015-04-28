@@ -40,7 +40,6 @@ class ReserveAPI(Resource):
         )
         return utils.api_response(payload=payload)
 
-
     @oauth.require_oauth()
     def post(self):
         parser = self.parser.copy()
@@ -48,6 +47,20 @@ class ReserveAPI(Resource):
         args = parser.parse_args(request)
         args['username'] = request.oauth.user.username
         reserve = models.Reserve.create(**args)
+        payload = dict(
+            reserve=reserve.serialize(),
+        )
+        return utils.api_response(payload=payload)
+
+    @oauth.require_oauth()
+    def put(self):
+        parser = self.parser.copy()
+        parser.add_argument('id', type=int, required=True)
+        parser.add_argument('cancelled', type=inputs.boolean, required=True)
+        args = parser.parse_args(request)
+        reserve = models.Reserve.get(args['id'])
+        reserve.verify_owner(request.oauth.user.username)
+        reserve.set(**args)
         payload = dict(
             reserve=reserve.serialize(),
         )
