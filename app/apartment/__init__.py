@@ -60,7 +60,7 @@ class ApartmentAPI(Resource):
     def get(self):
         parser = self.parser.copy()
         parser.add_argument('id', type=int, required=True)
-        args = self.parser.parse_args(request)
+        args = parser.parse_args(request)
         apartment = models.Apartment.get(**args)
         payload = dict(
             apartment=apartment.serialize(),
