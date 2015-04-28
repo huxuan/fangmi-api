@@ -615,6 +615,13 @@ class Apartment(db.Model):
     def max_price(self):
         return max([room.price for room in self.room_list])
 
+    @property
+    def status(self):
+        for room in self.room_list:
+            if room.status:
+                return True
+        return False
+
     @classmethod
     def create(cls, username, community_id, title="", subtitle="", address="",
         num_bathroom=0, num_bedroom=0, num_livingroom=0, type=0, devices=[],
@@ -693,6 +700,7 @@ class Apartment(db.Model):
             num_fav_users=self.num_fav_users,
             min_price=self.min_price,
             max_price=self.max_price,
+            status=self.status,
             type=self.type,
             comments=self.comments,
             devices=self.devices,
