@@ -26,6 +26,9 @@ class Fake(object):
         self.fake_community()
         self.fake_school_community()
         self.fake_apartment()
+        self.fake_apartment_photo()
+        self.fake_apartment_rent()
+        self.fake_apartment_reserve()
         self.fake_user_fav_apartment()
 
     def fake_client(self):
@@ -150,7 +153,13 @@ class Fake(object):
                 ],
             ),
         ]
+
+    def fake_apartment_photo(self):
         self.apartments[0].photos = [
+            file(utils.get_path_from_md5(
+                app.config['UPLOAD_AVATAR_FOLDER'],
+                app.config['DEFAULT_AVATAR_MD5'],
+            )),
             file(utils.get_path_from_md5(
                 app.config['UPLOAD_AVATAR_FOLDER'],
                 app.config['DEFAULT_AVATAR_MD5'],
@@ -165,15 +174,6 @@ class Fake(object):
                 app.config['UPLOAD_AVATAR_FOLDER'],
                 app.config['DEFAULT_AVATAR_MD5']
         ))
-        self.apartments[0].reserves = [
-            {
-                'username': 'u2',
-                'choice_id':self.apartments[0].reserve_choice_list[0].id,
-            }, {
-                'username': 'u2',
-                'choice_id':self.apartments[0].reserve_choice_list[1].id,
-            },
-        ]
         self.apartments[1].photos = [
             file(utils.get_path_from_md5(
                 app.config['UPLOAD_AVATAR_FOLDER'],
@@ -189,6 +189,17 @@ class Fake(object):
                 app.config['UPLOAD_AVATAR_FOLDER'],
                 app.config['DEFAULT_AVATAR_MD5']
         ))
+
+    def fake_apartment_reserve(self):
+        self.apartments[0].reserves = [
+            {
+                'username': 'u2',
+                'choice_id':self.apartments[0].reserve_choice_list[0].id,
+            }, {
+                'username': 'u2',
+                'choice_id':self.apartments[0].reserve_choice_list[1].id,
+            },
+        ]
         self.apartments[1].reserves = [
             {
                 'username': 'u1',
@@ -197,6 +208,18 @@ class Fake(object):
                 'username': 'u3',
                 'choice_id':self.apartments[1].reserve_choice_list[1].id,
             },
+        ]
+
+    def fake_apartment_rent(self):
+        self.rents = [
+            models.Rent.create(
+                self.users[0].username, self.apartments[0].room_list[0].id,
+                date(2015, 01, 01), date(2016, 01, 01),
+            ),
+            models.Rent.create(
+                self.users[1].username, self.apartments[1].room_list[0].id,
+                date(2015, 01, 01), date(2016, 01, 01),
+            ),
         ]
 
     def fake_user_fav_apartment(self):
