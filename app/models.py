@@ -825,6 +825,7 @@ class Room(db.Model):
         if not nullable and not res:
             raise utils.APIException(utils.API_CODE_NOT_FOUND,
                 name=cls.__tablename__)
+        return res
 
     def set(self, **kwargs):
         for key in kwargs:
