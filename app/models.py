@@ -1192,6 +1192,10 @@ class Message(db.Model):
             'unread'),
         db.Index('ix_message_key_to_username_unread_deleted', 'key',
             'to_username', 'unread', 'deleted'),
+        db.Index('ix_message_from_username_to_username_unread_deleted',
+            'from_username', 'to_username', 'unread', 'deleted'),
+        db.Index('ix_message_to_username_unread_deleted', 'to_username',
+            'unread', 'deleted'),
     )
 
     id = db.Column(db.Integer, primary_key=True)
