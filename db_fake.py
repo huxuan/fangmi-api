@@ -94,16 +94,6 @@ class Fake(object):
                     {'name': 'test_for_no_count'},
                     {'name': 'test_for_none_count', 'count': None},
                 ],
-                photos=[
-                    file(utils.get_path_from_md5(
-                        app.config['UPLOAD_AVATAR_FOLDER'],
-                        app.config['DEFAULT_AVATAR_MD5'],
-                    )),
-                    file(utils.get_path_from_md5(
-                        app.config['UPLOAD_AVATAR_FOLDER'],
-                        app.config['DEFAULT_AVATAR_MD5'],
-                    )),
-                ],
                 reserve_choices=[
                     {'date': date(1950, 10, 01), 'time_start': time(12, 34, 56),
                         'time_end': time(12, 56, 34)},
@@ -123,35 +113,25 @@ class Fake(object):
             models.Apartment.create(
                 self.users[0].username,
                 self.communities[1].id,
-                title='title1',
-                subtitle='subtitle1',
-                address='address1',
+                title='title2',
+                subtitle='subtitle2',
+                address='address2',
                 num_bedroom=3,
-                num_livingroom=1,
+                num_livingroom=2,
                 type=1,
-                contract=file(utils.get_path_from_md5(
-                    app.config['UPLOAD_AVATAR_FOLDER'],
-                    app.config['DEFAULT_AVATAR_MD5'],
-                )), devices=[
+                devices=[
                     {'name': 'name1', 'count': 1},
                     {'name': 'name2', 'count': 3},
                     {'name': 'test_for_no_count'},
                     {'name': 'test_for_none_count', 'count': None},
-                ], photos=[
-                    file(utils.get_path_from_md5(
-                        app.config['UPLOAD_AVATAR_FOLDER'],
-                        app.config['DEFAULT_AVATAR_MD5'],
-                    )),
-                    file(utils.get_path_from_md5(
-                        app.config['UPLOAD_AVATAR_FOLDER'],
-                        app.config['DEFAULT_AVATAR_MD5'],
-                    )),
-                ], reserve_choices=[
+                ],
+                reserve_choices=[
                     {'date': date(1950, 10, 01), 'time_start': time(12, 34, 56),
                         'time_end': time(12, 56, 34)},
                     {'date': date(1951, 10, 01), 'time_start': time(12, 34, 56),
                         'time_end': time(12, 56, 34)},
-                ], rooms=[
+                ],
+                rooms=[
                     {'name': '', 'area': 88, 'price': 1111,
                         'date_entrance': date(1949, 10, 01)},
                     {'name': '', 'area': 88, 'price': 2222,
@@ -162,13 +142,29 @@ class Fake(object):
                         'date_entrance': date(1949, 10, 01)},
                     {'name': '', 'area': 88, 'price': 5555,
                         'date_entrance': date(1949, 10, 01)},
-                ], tags=[
+                ],
+                tags=[
                     {'name': '标签1'},
                     {'name': '标签2'},
                     {'name': '标签3'},
                 ],
             ),
         ]
+        self.apartments[0].photos = [
+            file(utils.get_path_from_md5(
+                app.config['UPLOAD_AVATAR_FOLDER'],
+                app.config['DEFAULT_AVATAR_MD5'],
+            )),
+            file(utils.get_path_from_md5(
+                app.config['UPLOAD_AVATAR_FOLDER'],
+                app.config['DEFAULT_AVATAR_MD5'],
+            )),
+        ]
+        self.apartments[0].contract = file(
+            utils.get_path_from_md5(
+                app.config['UPLOAD_AVATAR_FOLDER'],
+                app.config['DEFAULT_AVATAR_MD5']
+        ))
         self.apartments[0].reserves = [
             {
                 'username': 'u2',
@@ -176,6 +172,30 @@ class Fake(object):
             }, {
                 'username': 'u2',
                 'choice_id':self.apartments[0].reserve_choice_list[1].id,
+            },
+        ]
+        self.apartments[1].photos = [
+            file(utils.get_path_from_md5(
+                app.config['UPLOAD_AVATAR_FOLDER'],
+                app.config['DEFAULT_AVATAR_MD5'],
+            )),
+            file(utils.get_path_from_md5(
+                app.config['UPLOAD_AVATAR_FOLDER'],
+                app.config['DEFAULT_AVATAR_MD5'],
+            )),
+        ]
+        self.apartments[1].contract = file(
+            utils.get_path_from_md5(
+                app.config['UPLOAD_AVATAR_FOLDER'],
+                app.config['DEFAULT_AVATAR_MD5']
+        ))
+        self.apartments[1].reserves = [
+            {
+                'username': 'u1',
+                'choice_id':self.apartments[1].reserve_choice_list[0].id,
+            }, {
+                'username': 'u3',
+                'choice_id':self.apartments[1].reserve_choice_list[1].id,
             },
         ]
 
