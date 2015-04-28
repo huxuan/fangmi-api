@@ -82,5 +82,16 @@ class ListAPI(Resource):
         )
         return utils.api_response(payload=payload)
 
+
+class ConversationAPI(Resource):
+
+    @oauth.require_oauth()
+    def get(self):
+        payload = dict(
+            conversations = request.oauth.user.get_conversion(),
+        )
+        return utils.api_response(payload=payload)
+
 api.add_resource(MessageAPI, '')
 api.add_resource(ListAPI, '/list')
+api.add_resource(ConversationAPI, '/conversation')

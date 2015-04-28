@@ -9,6 +9,7 @@ Description: Models for FangMi API.
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+import operator
 
 from sqlalchemy import and_
 from sqlalchemy.ext.declarative import AbstractConcreteBase
@@ -215,6 +216,39 @@ class User(db.Model):
     def is_fav_apartment(self, apartment_id):
         return self.fav_apartment_list.filter(
             users_fav_apartments.c.apartment_id == apartment_id).count() > 0
+
+    def get_num_unread_from_username(self, from_username):
+        return Message.query.filter_by(
+            from_username=from_username,
+            to_username=self.username,
+            unread=True,
+            deleted=False,
+        ).count()
+
+    def get_conversion(self):
+        conversation_list = {}
+        for to_username, max_id in Message.query.with_entities(
+                Message.to_username,
+                db.func.max(Message.id)
+            ).filter_by(from_username=self.username
+            ).group_by(Message.to_username).all():
+            conversation_list[to_username] = max(
+                conversation_list.get(to_username, 0), max_id)
+        for from_username, max_id in Message.query.with_entities(
+                Message.from_username,
+                db.func.max(Message.id)
+            ).filter_by(to_username=self.username
+            ).group_by(Message.from_username).all():
+            conversation_list[from_username] = max(
+                conversation_list.get(from_username, 0), max_id)
+        conversation_list = sorted(conversation_list.items(),
+            key=operator.itemgetter(1), reverse=True)
+        return [{
+            'user': User.get(username).serialize(),
+            'message': Message.get(message_id).serialize(),
+            'num_unread': self.get_num_unread_from_username(username),
+        } for username, message_id in conversation_list]
+
 
     def serialize(self):
         res = dict(
