@@ -1243,9 +1243,13 @@ class Message(db.Model):
         db.session.flush()
 
     @classmethod
+    def get_key(cls, from_username, to_username):
+        return '_'.join(sorted([from_username, to_username]))
+
+    @classmethod
     def create(cls, from_username, to_username, type, content):
         message = cls(
-            key='_'.join(sorted([from_username, to_username])),
+            key=cls.get_key(from_username, to_username),
             from_username=from_username,
             to_username=to_username,
             type=type,
@@ -1268,7 +1272,7 @@ class Message(db.Model):
     @classmethod
     def gets(cls, to_username, from_username, filter_unread=True,
         filter_deleted=True, **kwargs):
-        key='_'.join(sorted([to_username, from_username])),
+        key=cls.get_key(to_username, from_username)
         res = cls.query.filter_by(key=key)
         if filter_unread:
             res = res.filter(and_(
