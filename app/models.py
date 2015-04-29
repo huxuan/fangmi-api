@@ -521,6 +521,7 @@ class Apartment(db.Model):
         lazy='dynamic')
     device_list = db.relationship('Device', backref='apartment', lazy='dynamic')
     photo_list = db.relationship('Photo', backref='apartment', lazy='dynamic')
+    rent_list = db.relationship('Rent', backref='apartment', lazy='dynamic')
     reserve_list = db.relationship('Reserve', backref='apartment',
         lazy='dynamic')
     reserve_choice_list = db.relationship('ReserveChoice', backref='apartment',
