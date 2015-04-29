@@ -31,6 +31,7 @@ from app.oauth import bp_oauth
 from app.rent import rent
 from app.reserve import reserve
 from app.reserve_choice import reserve_choice
+from app.school import school
 from app.uploads import uploads
 from app.user import user
 
@@ -43,6 +44,7 @@ app.register_blueprint(message, url_prefix='/api/message')
 app.register_blueprint(rent, url_prefix='/api/rent')
 app.register_blueprint(reserve, url_prefix='/api/reserve')
 app.register_blueprint(reserve_choice, url_prefix='/api/reserve_choice')
+app.register_blueprint(school, url_prefix='/api/school')
 app.register_blueprint(uploads, url_prefix='/uploads')
 app.register_blueprint(user, url_prefix='/api/user')
 
