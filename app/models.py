@@ -439,14 +439,22 @@ class Community(db.Model):
         return community
 
     @classmethod
-    def get(cls, name, filter_deleted=True, nullable=False):
-        res = cls.query.filter_by(name=name)
+    def get(cls, id, filter_deleted=True, nullable=False):
+        res = cls.query.filter_by(id=id)
         if filter_deleted:
             res = res.filter_by(deleted=False)
         res = res.first()
         if not nullable and not res:
-            raise utils.APIException(utils.API_CODE_COMMUNITY_NOT_FOUND)
+            raise utils.APIException(utils.API_CODE_NOT_FOUND,
+                name=cls.__tablename__)
         return res
+
+    @classmethod
+    def gets(cls, filter_deleted=True):
+        res = cls.query
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        return res.all()
 
     def set(self, **kwargs):
         for key in kwargs:
