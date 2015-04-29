@@ -25,6 +25,7 @@ from app import utils
 from app.account import account
 from app.apartment import apartment
 from app.api import bp_api
+from app.community import community
 from app.message import message
 from app.oauth import bp_oauth
 from app.rent import rent
@@ -37,6 +38,7 @@ app.register_blueprint(account, url_prefix='/api/account')
 app.register_blueprint(apartment, url_prefix='/api/apartment')
 app.register_blueprint(bp_api, url_prefix='/api')
 app.register_blueprint(bp_oauth, url_prefix='/oauth')
+app.register_blueprint(community, url_prefix='/api/community')
 app.register_blueprint(message, url_prefix='/api/message')
 app.register_blueprint(rent, url_prefix='/api/rent')
 app.register_blueprint(reserve, url_prefix='/api/reserve')
