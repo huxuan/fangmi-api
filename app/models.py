@@ -1129,7 +1129,7 @@ class Rent(db.Model):
         return dict(
             id=self.id,
             user=self.user_info,
-            #apartment=self.apartment_info,
+            apartment=self.apartment_info,
             room=self.room_info,
             date_start=self.date_start.isoformat(),
             date_end=self.date_end.isoformat(),
