@@ -1225,6 +1225,7 @@ class Reserve(db.Model):
             id=self.id,
             user=self.user_info,
             reserve_choice=self.reserve_choice_info,
+            cancelled=self.cancelled,
             #apartment=self.apartment_info,
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
