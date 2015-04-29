@@ -727,8 +727,8 @@ class Apartment(db.Model):
                 name=self.__tablename__)
         return True
 
-    def serialize(self):
-        return dict(
+    def serialize(self, oauth_user=None):
+        res = dict(
             id=self.id,
             user=self.user_info,
             community=self.community_info,
@@ -753,6 +753,11 @@ class Apartment(db.Model):
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
         )
+        if oauth_user:
+            res.update(dict(
+                is_favorited=oauth_user.is_fav_apartment(self.id),
+            ))
+        return res
 
 
 class ReserveChoice(db.Model):
