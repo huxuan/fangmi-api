@@ -462,6 +462,13 @@ class Community(db.Model):
             res = res.filter_by(deleted=False)
         return res.all()
 
+    @classmethod
+    def search(cls, q, filter_deleted=True):
+        res = cls.query.whoosh_search(q)
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        return res.all()
+
     def set(self, **kwargs):
         for key in kwargs:
             if kwargs[key] is not None:

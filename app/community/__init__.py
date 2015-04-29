@@ -49,5 +49,20 @@ class ListAPI(Resource):
         )
         return utils.api_response(payload=payload)
 
+
+class SearchAPI(Resource):
+    @oauth.require_oauth()
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('q', required=True)
+        args = parser.parse_args(request)
+        payload = dict(
+            communities=[community.serialize()
+                for community in models.Community.search(**args)],
+        )
+        return utils.api_response(payload=payload)
+
+
 api.add_resource(CommunityAPI, '')
 api.add_resource(ListAPI, '/list')
+api.add_resource(SearchAPI, '/search')
