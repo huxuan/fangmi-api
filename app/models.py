@@ -6,6 +6,10 @@ Author: huxuan
 Email: i(at)huxuan.org
 Description: Models for FangMi API.
 """
+import sys
+sys.path.insert(0, 'Flask-WhooshAlchemy')
+import flask_whooshalchemy as whooshalchemy
+
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
@@ -282,6 +286,7 @@ class User(db.Model):
 
 class School(db.Model):
     __tablename__ = 'schools'
+    __searchable__ = ['name']
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -389,6 +394,7 @@ class School(db.Model):
 
 class Community(db.Model):
     __tablename__ = 'communities'
+    __searchable__ = ['name', 'address', 'traffic']
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -499,6 +505,7 @@ class Community(db.Model):
 
 class Apartment(db.Model):
     __tablename__ = 'apartments'
+    __searchable__ = ['title', 'subtitle', 'address']
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -1546,3 +1553,7 @@ class Token(db.Model):
         db.session.add(token)
         db.session.commit()
         return token
+
+whooshalchemy.whoosh_index(app, School)
+whooshalchemy.whoosh_index(app, Community)
+whooshalchemy.whoosh_index(app, Apartment)
