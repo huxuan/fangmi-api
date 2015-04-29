@@ -33,36 +33,36 @@ class Fake(object):
 
     def fake_client(self):
         self.clients = [
-            models.Client.setter('fangmi-web'),
-            models.Client.setter('fangmi-ios'),
-            models.Client.setter('fangmi-android'),
-            models.Client.setter('fangmi-test'),
+            models.Client.setter(u'fangmi-web'),
+            models.Client.setter(u'fangmi-ios'),
+            models.Client.setter(u'fangmi-android'),
+            models.Client.setter(u'fangmi-test'),
         ]
 
     def fake_user(self):
         self.users = [
-            models.User.create('u1', 'pwd1'),
-            models.User.create('u2', 'pwd2'),
-            models.User.create('u3', 'pwd2'),
-            models.User.create('u4', 'pwd4'),
+            models.User.create(u'u1', u'pwd1'),
+            models.User.create(u'u2', u'pwd2'),
+            models.User.create(u'u3', u'pwd2'),
+            models.User.create(u'u4', u'pwd4'),
         ]
         self.user_list = [user.serialize() for user in self.users]
 
     def fake_school(self):
         self.schools = [
-            models.School.create('清华大学', None, None),
-            models.School.create('北京大学', None, None),
-            models.School.create('人民大学', None, None),
-            models.School.create('北京航空航天大学', None, None),
+            models.School.create(u'清华大学', None, None),
+            models.School.create(u'北京大学', None, None),
+            models.School.create(u'人民大学', None, None),
+            models.School.create(u'北京航空航天大学', None, None),
         ]
         self.school_list = [school.serialize() for school in self.schools]
 
     def fake_community(self):
         self.communities = [
-            models.Community.create('小区1', '地址1', '交通1', None),
-            models.Community.create('小区2', '地址2', '交通2', None),
-            models.Community.create('小区3', '地址3', '交通3', None),
-            models.Community.create('小区4', '地址4', '交通4', None),
+            models.Community.create(u'小区1', u'地址1', u'交通1', None),
+            models.Community.create(u'小区2', u'地址2', u'交通2', None),
+            models.Community.create(u'小区3', u'地址3', u'交通3', None),
+            models.Community.create(u'小区4', u'地址4', u'交通4', None),
         ]
         self.community_list = [community.serialize()
             for community in self.communities]
@@ -78,71 +78,71 @@ class Fake(object):
             models.Apartment.create(
                 self.users[0].username,
                 self.communities[1].id,
-                title='title1',
-                subtitle='subtitle1',
-                address='address1',
+                title=u'title1',
+                subtitle=u'subtitle1',
+                address=u'address1',
                 num_bedroom=3,
                 num_livingroom=1,
                 type=0,
                 devices=[
-                    {'name': 'name1', 'count': 1},
-                    {'name': 'name2', 'count': 3},
-                    {'name': 'test_for_no_count'},
-                    {'name': 'test_for_none_count', 'count': None},
+                    {u'name': u'name1', u'count': 1},
+                    {u'name': u'name2', u'count': 3},
+                    {u'name': u'test_for_no_count'},
+                    {u'name': u'test_for_none_count', u'count': None},
                 ],
                 reserve_choices=[
-                    {'date': date(1950, 10, 01), 'time_start': time(12, 34, 56),
-                        'time_end': time(12, 56, 34)},
-                    {'date': date(1951, 10, 01), 'time_start': time(12, 34, 56),
-                        'time_end': time(12, 56, 34)},
+                    {u'date': date(1950, 10, 01), u'time_start': time(12, 34, 56),
+                        u'time_end': time(12, 56, 34)},
+                    {u'date': date(1951, 10, 01), u'time_start': time(12, 34, 56),
+                        u'time_end': time(12, 56, 34)},
                 ],
                 rooms=[
-                    {'name': '', 'area': 88, 'price': 8888,
-                        'date_entrance': date(1949, 10, 01)},
+                    {u'name': u'', u'area': 88, u'price': 8888,
+                        u'date_entrance': date(1949, 10, 01)},
                 ],
                 tags=[
-                    {'name': '标签1'},
-                    {'name': '标签2'},
-                    {'name': '标签3'},
+                    {u'name': u'标签1'},
+                    {u'name': u'标签2'},
+                    {u'name': u'标签3'},
                 ],
             ),
             models.Apartment.create(
                 self.users[0].username,
                 self.communities[1].id,
-                title='title2',
-                subtitle='subtitle2',
-                address='address2',
+                title=u'title2',
+                subtitle=u'subtitle2',
+                address=u'address2',
                 num_bedroom=3,
                 num_livingroom=2,
                 type=1,
                 devices=[
-                    {'name': 'name1', 'count': 1},
-                    {'name': 'name2', 'count': 3},
-                    {'name': 'test_for_no_count'},
-                    {'name': 'test_for_none_count', 'count': None},
+                    {u'name': u'name1', u'count': 1},
+                    {u'name': u'name2', u'count': 3},
+                    {u'name': u'test_for_no_count'},
+                    {u'name': u'test_for_none_count', u'count': None},
                 ],
                 reserve_choices=[
-                    {'date': date(1950, 10, 01), 'time_start': time(12, 34, 56),
-                        'time_end': time(12, 56, 34)},
-                    {'date': date(1951, 10, 01), 'time_start': time(12, 34, 56),
-                        'time_end': time(12, 56, 34)},
+                    {u'date': date(1950, 10, 01), u'time_start': time(12, 34, 56),
+                        u'time_end': time(12, 56, 34)},
+                    {u'date': date(1951, 10, 01), u'time_start': time(12, 34, 56),
+                        u'time_end': time(12, 56, 34)},
                 ],
                 rooms=[
-                    {'name': '', 'area': 88, 'price': 1111,
-                        'date_entrance': date(1949, 10, 01)},
-                    {'name': '', 'area': 88, 'price': 2222,
-                        'date_entrance': date(1949, 10, 01)},
-                    {'name': '', 'area': 88, 'price': 3333,
-                        'date_entrance': date(1949, 10, 01)},
-                    {'name': '', 'area': 88, 'price': 4444,
-                        'date_entrance': date(1949, 10, 01)},
-                    {'name': '', 'area': 88, 'price': 5555,
-                        'date_entrance': date(1949, 10, 01)},
+                    {u'name': u'', u'area': 88, u'price': 1111,
+                        u'date_entrance': date(1949, 10, 01)},
+                    {u'name': u'', u'area': 88, u'price': 2222,
+                        u'date_entrance': date(1949, 10, 01)},
+                    {u'name': u'', u'area': 88, u'price': 3333,
+                        u'date_entrance': date(1949, 10, 01)},
+                    {u'name': u'', u'area': 88, u'price': 4444,
+                        u'date_entrance': date(1949, 10, 01)},
+                    {u'name': u'', u'area': 88, u'price': 5555,
+                        u'date_entrance': date(1949, 10, 01)},
                 ],
                 tags=[
-                    {'name': '标签1'},
-                    {'name': '标签2'},
-                    {'name': '标签3'},
+                    {u'name': u'标签1'},
+                    {u'name': u'标签2'},
+                    {u'name': u'标签3'},
                 ],
             ),
         ]
