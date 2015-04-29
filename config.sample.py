@@ -34,6 +34,16 @@ DATE_FORMAT = '%Y-%m-%d'
 TIME_FORMAT = '%H:%M:%S'
 DATETIME_FORMAT = ' '.join([DATE_FORMAT, TIME_FORMAT])
 
+# Whoosh / Text Search related.
+WHOOSH_DIR = 'whoosh_index'
+WHOOSH_BASE = os.path.realpath(os.path.join(
+    os.path.dirname(__file__),
+    WHOOSH_DIR,
+))
+from jieba.analyse import ChineseAnalyzer
+WHOOSH_ANALYZER = ChineseAnalyzer()
+
+
 # The maximum content size when uploading.
 MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 # The maximun block size we read every time when processing file.
