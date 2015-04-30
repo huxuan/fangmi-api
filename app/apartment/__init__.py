@@ -72,17 +72,20 @@ class ApartmentAPI(Resource):
     def put(self):
         parser = self.parser.copy()
         parser.add_argument('id', type=int)
-        parser.add_argument('title')
-        parser.add_argument('subtitle')
-        parser.add_argument('address')
-        parser.add_argument('num_bedroom', type=int)
-        parser.add_argument('num_livingroom', type=int)
-        parser.add_argument('type', type=int)
+        parser.add_argument('community_id', type=int, required=True)
+        parser.add_argument('title', required=True)
+        parser.add_argument('subtitle', required=True)
+        parser.add_argument('address', required=True)
+        parser.add_argument('num_bedroom', type=int, required=True)
+        parser.add_argument('num_livingroom', type=int, required=True)
+        parser.add_argument('type', type=int, default=0)
         parser.add_argument('devices', type=device_type, action='append')
         parser.add_argument('reserve_choices', type=reserve_choice_type,
-            action='append')
-        parser.add_argument('rooms', type=room_type, action='append')
-        parser.add_argument('tags', type=tag_type, action='append')
+            action='append', required=True)
+        parser.add_argument('rooms', type=room_type, action='append',
+            required=True)
+        parser.add_argument('tags', type=tag_type, action='append',
+            required=True)
         args = parser.parse_args(request)
         apartment = models.Apartment.get(args['id'])
         apartment.verify_owner(request.oauth.user.username)
@@ -101,9 +104,8 @@ class ApartmentAPI(Resource):
         parser.add_argument('address', required=True)
         parser.add_argument('num_bedroom', type=int, required=True)
         parser.add_argument('num_livingroom', type=int, required=True)
-        parser.add_argument('type', type=int)
-        parser.add_argument('devices', type=device_type, action='append',
-            required=True)
+        parser.add_argument('type', type=int, default=0)
+        parser.add_argument('devices', type=device_type, action='append')
         parser.add_argument('reserve_choices', type=reserve_choice_type,
             action='append', required=True)
         parser.add_argument('rooms', type=room_type, action='append',
