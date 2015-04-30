@@ -8,8 +8,8 @@ Description: Views for admin
 """
 from flask import redirect
 from flask import request
-from flask import url_for
 from flask import session
+from flask import url_for
 from flask.ext.admin import AdminIndexView
 from flask.ext.admin import BaseView
 from flask.ext.admin import expose
@@ -18,6 +18,7 @@ from flask.ext.admin.contrib.sqla import ModelView
 from flask.ext.login import current_user
 from flask.ext.login import login_user
 from flask.ext.login import logout_user
+from jinja2 import Markup
 
 from . import forms
 
@@ -56,6 +57,28 @@ class MyView(BaseView):
         if not self.is_accessible():
             return redirect(url_for('.login', next=request.url))
 
+
 class MyModelView(ModelView, MyView):
     column_display_pk = True
-    column_hide_backrefs = False
+    column_auto_select_related = True
+
+
+class StudentConfrimModelView(MyModelView):
+    can_create = False
+    can_delete = False
+    can_edit = False
+    column_descriptions = dict(
+        is_student=u'勾号(True)表示已认证<br>减号(False)表示未认证',
+    )
+    column_editable_list = ('is_student', )
+    column_filters = ('username', 'school', 'major', 'student_id', 'is_student')
+    column_formatters = dict(
+        pic_student_md5=lambda v, c, m, p:
+            Markup('<img src="{}">'.format(m.pic_student)),
+    )
+    column_labels = dict(username=u'用户名', school=u'学校', major=u'专业',
+        student_id=u'学号', pic_student_md5=u'学生证照片',
+        is_student=u'是否已认证')
+    column_list = ('username', 'school', 'major', 'student_id',
+        'pic_student_md5', 'is_student')
+    column_searchable_list = ('username', 'school', 'major', 'student_id')
