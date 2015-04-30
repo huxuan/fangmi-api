@@ -1590,6 +1590,34 @@ class Token(db.Model):
         db.session.commit()
         return token
 
+class Admin(db.Model):
+    username = db.Column(db.String(32), primary_key=True)
+    password_hash = db.Column(db.String(128), nullable=False)
+
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    deleted = db.Column(db.Boolean, default=False)
+
+    @property
+    def password(self):
+        raise AttributeError('password is not a readable attribute')
+
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.username
+
+
 whooshalchemy.whoosh_index(app, School)
 whooshalchemy.whoosh_index(app, Community)
 whooshalchemy.whoosh_index(app, Apartment)
