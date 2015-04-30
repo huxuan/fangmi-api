@@ -1,6 +1,7 @@
 flask
 flask-admin
 flask-cors
+flask-login
 flask-oauthlib
 flask-restful
 flask-sqlalchemy
