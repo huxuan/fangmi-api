@@ -21,8 +21,7 @@ db = SQLAlchemy(app)
 
 from app import models
 from app import utils
-
-from app.admin import admin
+from app import admin
 
 from app.account import account
 from app.apartment import apartment
