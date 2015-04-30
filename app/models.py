@@ -1591,6 +1591,8 @@ class Token(db.Model):
         return token
 
 class Admin(db.Model):
+    __tablename__ = 'admins'
+
     username = db.Column(db.String(32), primary_key=True)
     password_hash = db.Column(db.String(128), nullable=False)
 
@@ -1616,6 +1618,33 @@ class Admin(db.Model):
 
     def get_id(self):
         return self.username
+
+    @classmethod
+    def create(cls, username, password):
+        admin_user = cls(
+            username=username,
+            password=password,
+        )
+        db.session.add(admin_user)
+        db.session.commit()
+        return admin_user
+
+    @classmethod
+    def get(cls, username, filter_deleted=True, nullable=False):
+        res = cls.query.filter_by(username=username)
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        res = res.first()
+        if not nullable and not res:
+            raise utils.APIException(utils.API_CODE_NOT_FOUND,
+                name=cls.__tablename__)
+        return res
+
+    def verify_password(self, password):
+        if check_password_hash(self.password_hash, password):
+            return True
+        else:
+            raise utils.APIException(utils.API_CODE_PASSWORD_INVALID)
 
 
 whooshalchemy.whoosh_index(app, School)
