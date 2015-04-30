@@ -12,6 +12,8 @@ from threading import Thread
 import cStringIO as StringIO
 import hashlib
 import os
+import re
+import requests
 
 from flask import json
 from flask import jsonify
@@ -50,6 +52,7 @@ ARGUMENT_NAME = {
     'id_number': '身份证号',
     'json': 'Json 数据',
     'major': '专业',
+    'mobile': '手机号',
     'messages': '消息',
     'password': '密码',
     'pic_student': '学生证图片',
@@ -257,3 +260,30 @@ def save_file(stream, folder):
         return file_md5
     else:
         return ""
+
+
+MOBILE_PATTERN = re.compile("^1[34578]\d{9}$")
+
+
+def verify_mobile(mobile):
+    if MOBILE_PATTERN.match(mobile):
+        return True
+    else:
+        raise APIException(API_CODE_INVALID, name='mobile')
+
+
+@async
+def send_async_sms(mobile, message):
+    payload = {
+        'cdkey': app.config['EMY_CDKEY'],
+        'password': app.config['EMY_PASSWORD'],
+        'phone': mobile,
+        'message': message,
+    }
+    r = requests.post(app.config['EMY_URL'], data=payload)
+    return r
+
+
+def send_captcha_sms(mobile, captcha):
+    message = app.config['EMY_MESSAGE'].format(captcha)
+    send_async_sms(mobile, message)
