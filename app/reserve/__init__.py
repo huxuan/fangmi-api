@@ -56,7 +56,7 @@ class ReserveAPI(Resource):
     def put(self):
         parser = self.parser.copy()
         parser.add_argument('id', type=int, required=True)
-        parser.add_argument('cancelled', type=inputs.boolean, required=True)
+        parser.add_argument('cancelled', type=inputs.boolean, default=False)
         args = parser.parse_args(request)
         reserve = models.Reserve.get(args['id'])
         reserve.verify_owner(request.oauth.user.username)
