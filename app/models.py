@@ -63,7 +63,7 @@ class User(db.Model):
 
     # Personal Information.
     real_name = db.Column(db.String(16))
-    mobile = db.Column(db.String(11))
+    mobile = db.Column(db.String(11), default=username)
     id_number = db.Column(db.String(18))
     school = db.Column(db.String(32))
     major = db.Column(db.String(32))
