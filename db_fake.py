@@ -21,6 +21,7 @@ class Fake(object):
 
     def __init__(self):
         self.fake_client()
+        self.fake_admin()
         self.fake_user()
         self.fake_school()
         self.fake_community()
@@ -38,6 +39,9 @@ class Fake(object):
             models.Client.setter(u'fangmi-android'),
             models.Client.setter(u'fangmi-test'),
         ]
+
+    def fake_admin(self):
+        models.Admin.create('admin', 'password')
 
     def fake_user(self):
         self.users = [
