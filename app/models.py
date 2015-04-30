@@ -14,6 +14,7 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 import operator
+import random
 
 from sqlalchemy import and_
 from sqlalchemy.ext.declarative import AbstractConcreteBase
@@ -1496,6 +1497,19 @@ class Captcha(db.Model):
             raise utils.APIException(utils.API_CODE_CAPTCHA_INVALID)
         captcha.deleted = True
         db.session.flush()
+
+    @classmethod
+    def create(cls, mobile):
+        utils.verify_mobile(mobile)
+        token = random.randint(100000, 999999)
+        captcha = cls(
+            mobile=mobile,
+            token=token,
+        )
+        utils.send_captcha_sms(mobile, token)
+        db.session.add(captcha)
+        db.session.commit()
+        return captcha
 
 
 class Client(db.Model):
