@@ -28,7 +28,6 @@ class SchoolAPI(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
 
-    @oauth.require_oauth()
     def get(self):
         parser = self.parser.copy()
         parser.add_argument('id', type=int, required=True)
@@ -41,7 +40,6 @@ class SchoolAPI(Resource):
 
 
 class ListAPI(Resource):
-    @oauth.require_oauth()
     def get(self):
         payload = dict(
             schools=[school.serialize()
@@ -51,7 +49,6 @@ class ListAPI(Resource):
 
 
 class SearchAPI(Resource):
-    @oauth.require_oauth()
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('q', required=True)
