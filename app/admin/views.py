@@ -63,10 +63,13 @@ class MyModelView(ModelView, MyView):
     column_auto_select_related = True
 
 
-class StudentConfrimModelView(MyModelView):
+class ConfirmModelView(MyModelView):
     can_create = False
     can_delete = False
     can_edit = False
+
+
+class StudentConfirmModelView(ConfirmModelView):
     column_descriptions = dict(
         is_student=u'勾号(True)表示已认证<br>减号(False)表示未认证',
     )
@@ -82,3 +85,15 @@ class StudentConfrimModelView(MyModelView):
     column_list = ('username', 'school', 'major', 'student_id',
         'pic_student_md5', 'is_student')
     column_searchable_list = ('username', 'school', 'major', 'student_id')
+
+
+class RealNameConfirmModelView(ConfirmModelView):
+    column_descriptions = dict(
+        is_confirmed=u'勾号(True)表示已认证<br>减号(False)表示未认证',
+    )
+    column_editable_list = ('is_confirmed', )
+    column_filters = ('username', 'real_name', 'id_number', 'is_confirmed')
+    column_labels = dict(username=u'用户名', real_name=u'真实姓名',
+        id_number=u'身份证号', is_confirmed=u'是否已认证')
+    column_list = ('username', 'real_name', 'id_number', 'is_confirmed')
+    column_searchable_list = ('username', 'real_name', 'id_number')

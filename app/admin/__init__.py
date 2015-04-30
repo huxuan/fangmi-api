@@ -59,5 +59,7 @@ admin.add_view(views.MyModelView(models.Client, db.session,
     endpoint='admin_client', category="Model"))
 admin.add_view(views.MyModelView(models.Token, db.session,
     endpoint='admin_token', category="Model"))
-admin.add_view(views.StudentConfrimModelView(models.User, db.session,
+admin.add_view(views.StudentConfirmModelView(models.User, db.session,
     endpoint='student_confirm', name='Student Confirm'))
+admin.add_view(views.RealNameConfirmModelView(models.User, db.session,
+    endpoint='real_name_confirm', name='Real Name Confirm'))
