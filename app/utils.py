@@ -8,6 +8,7 @@ Description: Shared library for FangMi.
 """
 from datetime import datetime
 from shutil import copyfileobj
+from threading import Thread
 import cStringIO as StringIO
 import hashlib
 import os
@@ -92,6 +93,13 @@ API_CODE_MESSAGE = {
     API_CODE_USER_NOT_AUTHORIZED: u'用户验证失败。',
     API_CODE_USER_NOT_FOUND: u'用户不存在。',
 }
+
+
+def async(f):
+    def wrapper(*args, **kwargs):
+        thr = Thread(target=f, args=args, kwargs=kwargs)
+        thr.start()
+    return wrapper
 
 
 class APIResponse():
