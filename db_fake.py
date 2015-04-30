@@ -50,6 +50,11 @@ class Fake(object):
             models.User.create(u'u3', u'pwd2'),
             models.User.create(u'u4', u'pwd4'),
         ]
+        for user in self.users:
+            user.pic_student = file(utils.get_path_from_md5(
+                app.config['UPLOAD_AVATAR_FOLDER'],
+                app.config['DEFAULT_AVATAR_MD5'],
+            ))
         self.user_list = [user.serialize() for user in self.users]
 
     def fake_school(self):
