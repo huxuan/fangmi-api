@@ -179,6 +179,14 @@ class User(db.Model):
         return res
 
     @classmethod
+    def gets(cls, filter_deleted=True, limit=10):
+        res = cls.query
+        if filter_deleted:
+            res = res.filter_by(deleted=False)
+        res = res.limit(limit)
+        return res.all()
+
+    @classmethod
     def check_not_exist(cls, username):
         if cls.get(username, nullable=True):
             raise utils.APIException(utils.API_CODE_USER_DUPLICATE)

@@ -42,9 +42,14 @@ class ListAPI(Resource):
 
     def get(self):
         args = self.parser.parse_args(request)
+        if args['username']:
+            users = [models.User.get(username).serialize()
+                for username in args['username']]
+        else:
+            users = [user.serialize()
+                for user in models.User.gets()]
         payload = dict(
-            users=[models.User.get(username).serialize()
-                for username in args['username']],
+            users=users,
         )
         return utils.api_response(payload=payload)
 
