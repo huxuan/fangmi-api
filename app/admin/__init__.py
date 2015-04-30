@@ -26,36 +26,36 @@ admin = Admin(app, name="FangMi Admin",
     template_mode='bootstrap3',
 )
 admin.add_view(views.MyModelView(models.Admin, db.session,
-    endpoint='admin_admin'))
+    endpoint='admin_admin', category="Model"))
 admin.add_view(views.MyModelView(models.User, db.session,
-    endpoint='admin_user'))
+    endpoint='admin_user', category="Model"))
 admin.add_view(views.MyModelView(models.School, db.session,
-    endpoint='admin_school'))
+    endpoint='admin_school', category="Model"))
 admin.add_view(views.MyModelView(models.Community, db.session,
-    endpoint='admin_community'))
+    endpoint='admin_community', category="Model"))
 admin.add_view(views.MyModelView(models.Apartment, db.session,
-    endpoint='admin_apartment'))
+    endpoint='admin_apartment', category="Model"))
 admin.add_view(views.MyModelView(models.ReserveChoice, db.session,
-    endpoint='admin_reserve_choice'))
+    endpoint='admin_reserve_choice', category="Model"))
 admin.add_view(views.MyModelView(models.Room, db.session,
-    endpoint='admin_room'))
+    endpoint='admin_room', category="Model"))
 admin.add_view(views.MyModelView(models.Device, db.session,
-    endpoint='admin_device'))
+    endpoint='admin_device', category="Model"))
 admin.add_view(views.MyModelView(models.Photo, db.session,
-    endpoint='admin_photo'))
+    endpoint='admin_photo', category="Model"))
 admin.add_view(views.MyModelView(models.Tag, db.session,
-    endpoint='admin_tag'))
+    endpoint='admin_tag', category="Model"))
 admin.add_view(views.MyModelView(models.Rent, db.session,
-    endpoint='admin_rent'))
+    endpoint='admin_rent', category="Model"))
 admin.add_view(views.MyModelView(models.Reserve, db.session,
-    endpoint='admin_reserve'))
+    endpoint='admin_reserve', category="Model"))
 admin.add_view(views.MyModelView(models.Message, db.session,
-    endpoint='admin_message'))
+    endpoint='admin_message', category="Model"))
 admin.add_view(views.MyModelView(models.Comment, db.session,
-    endpoint='admin_comment'))
+    endpoint='admin_comment', category="Model"))
 admin.add_view(views.MyModelView(models.Captcha, db.session,
-    endpoint='admin_captcha'))
+    endpoint='admin_captcha', category="Model"))
 admin.add_view(views.MyModelView(models.Client, db.session,
-    endpoint='admin_client'))
+    endpoint='admin_client', category="Model"))
 admin.add_view(views.MyModelView(models.Token, db.session,
-    endpoint='admin_token'))
+    endpoint='admin_token', category="Model"))
