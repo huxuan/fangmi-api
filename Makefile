@@ -10,3 +10,4 @@ clean:
 	-@sudo rm -rf whoosh_index
 permission:
 	chown -R www-data.www-data .
+	chown www-data.www-data /tmp/jieba.cache
