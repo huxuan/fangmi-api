@@ -9,5 +9,4 @@ clean:
 	find . -name '*.swp' -print0 | xargs -0 rm -f
 	-@sudo rm -rf whoosh_index
 permission:
-	sudo chown -R www-data.www-data uploads
-	sudo chown -R www-data.www-data whoosh_index
+	chown -R www-data.www-data .
