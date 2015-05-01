@@ -688,6 +688,10 @@ class Apartment(db.Model):
         return self.fav_users.count()
 
     @property
+    def num_reserve(self):
+        return self.reserve_list.count()
+
+    @property
     def min_price(self):
         return min([room.price for room in self.room_list])
 
@@ -785,6 +789,7 @@ class Apartment(db.Model):
             num_bedroom=self.num_bedroom,
             num_livingroom=self.num_livingroom,
             num_fav_users=self.num_fav_users,
+            num_reserve=self.num_reserve,
             min_price=self.min_price,
             max_price=self.max_price,
             status=self.status,
