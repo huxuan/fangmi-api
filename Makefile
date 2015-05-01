@@ -8,3 +8,6 @@ clean:
 	find . -name '*.pyc' -print0 | xargs -0 rm -f
 	find . -name '*.swp' -print0 | xargs -0 rm -f
 	-@sudo rm -rf whoosh_index
+permission:
+	sudo chown -R www-data.www-data uploads
+	sudo chown -R www-data.www-data whoosh_index
