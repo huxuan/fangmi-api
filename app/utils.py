@@ -45,6 +45,7 @@ API_CODE_USER_NOT_FOUND = 9003
 
 ARGUMENT_NAME = {
     'apartments': '房屋',
+    'captchas': '验证码',
     'devices': '设备',
     'devices.count': '设备数量',
     'devices.name': '设备名称',
@@ -52,8 +53,8 @@ ARGUMENT_NAME = {
     'id_number': '身份证号',
     'json': 'Json 数据',
     'major': '专业',
-    'mobile': '手机号',
     'messages': '消息',
+    'mobile': '手机号',
     'password': '密码',
     'password_confirm': '密码确认',
     'password_new': '新密码',
@@ -290,4 +291,4 @@ def send_async_sms(mobile, message):
 
 def send_captcha_sms(mobile, captcha):
     message = app.config['EMY_MESSAGE'].format(captcha)
-    send_async_sms(mobile, message)
+    return send_async_sms(mobile, message)

@@ -1497,15 +1497,17 @@ class Captcha(db.Model):
 
     @classmethod
     def verify(cls, mobile, token):
-        return True # NOTE(huxuan): Hack verify() until captcha feature is done.
         captcha = cls.query.filter_by(mobile=mobile).filter_by(deleted=False)\
             .first()
         if not captcha:
-            raise utils.APIException(utils.API_CODE_CAPTCHA_NOT_FOUND)
+            raise utils.APIException(utils.API_CODE_NOT_FOUND,
+                name=cls.__tablename__)
         if captcha.token != token:
-            raise utils.APIException(utils.API_CODE_CAPTCHA_INVALID)
+            raise utils.APIException(utils.API_CODE_INVALID,
+                name=cls.__tablename__)
         captcha.deleted = True
         db.session.flush()
+        return True
 
     @classmethod
     def create(cls, mobile):
