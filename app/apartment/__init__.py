@@ -10,6 +10,7 @@ from flask import Blueprint
 from flask import request
 from flask.ext.restful import Api
 from flask.ext.restful import Resource
+from flask.ext.restful import inputs
 from flask.ext.restful import reqparse
 from werkzeug import datastructures
 
@@ -87,6 +88,7 @@ class ApartmentAPI(Resource):
             required=True)
         parser.add_argument('tags', type=tag_type, action='append',
             required=True)
+        parser.add_argument('cancelled', type=inputs.boolean, default=False)
         args = parser.parse_args(request)
         apartment = models.Apartment.get(args['id'])
         apartment.verify_owner(request.oauth.user.username)
@@ -181,7 +183,14 @@ class ListAPI(Resource):
         self.parser.add_argument('username')
         self.parser.add_argument('community_id', type=int)
         self.parser.add_argument('school_id', type=int)
+        self.parser.add_argument('q')
+        self.parser.add_argument('filter_cancelled', type=inputs.boolean,
+            default=True)
+        self.parser.add_argument('filter_deleted', type=inputs.boolean,
+            default=True)
+        self.parser.add_argument('limit', type=int)
 
+    @oauth.require_oauth()
     def get(self):
         args = self.parser.parse_args(request)
         payload = dict(
@@ -191,21 +200,7 @@ class ListAPI(Resource):
         return utils.api_response(payload=payload)
 
 
-class SearchAPI(Resource):
-    @oauth.require_oauth()
-    def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('q', required=True)
-        args = parser.parse_args(request)
-        payload = dict(
-            apartments=[apartment.serialize()
-                for apartment in models.Apartment.search(**args)],
-        )
-        return utils.api_response(payload=payload)
-
-
 api.add_resource(ApartmentAPI, '')
 api.add_resource(PhotosAPI, '/photos')
 api.add_resource(FavoriteAPI, '/fav')
 api.add_resource(ListAPI, '/list')
-api.add_resource(SearchAPI, '/search')

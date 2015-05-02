@@ -550,6 +550,7 @@ class Apartment(db.Model):
     num_bedroom = db.Column(db.SmallInteger)
     num_livingroom = db.Column(db.SmallInteger)
     type = db.Column(db.SmallInteger)
+    cancelled = db.Column(db.Boolean, default=False)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
     deleted = db.Column(db.Boolean, default=False)
@@ -741,7 +742,7 @@ class Apartment(db.Model):
 
     @classmethod
     def gets(cls, username=None, community_id=None, school_id=None,
-        filter_deleted=True):
+        q=None, filter_cancelled=True, filter_deleted=True, limit=10):
         res = cls.query
         if username:
             res = res.filter_by(username=username)
@@ -752,9 +753,11 @@ class Apartment(db.Model):
             community_ids = [community.id
                 for community in school.community_list]
             res = res.filter(Apartment.community_id.in_(community_ids))
+        if filter_cancelled:
+            res = res.filter_by(cancelled=False)
         if filter_deleted:
             res = res.filter_by(deleted=False)
-        res = res.all()
+        res = res.limit(limit).all()
         return res
 
     @classmethod
@@ -793,6 +796,7 @@ class Apartment(db.Model):
             min_price=self.min_price,
             max_price=self.max_price,
             status=self.status,
+            cancelled=self.cancelled,
             type=self.type,
             comments=self.comments,
             devices=self.devices,
