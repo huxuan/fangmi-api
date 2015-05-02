@@ -1613,6 +1613,7 @@ class Token(db.Model):
         db.session.commit()
         return token
 
+
 class Admin(db.Model):
     __tablename__ = 'admins'
 
