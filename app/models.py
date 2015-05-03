@@ -1489,7 +1489,7 @@ class Captcha(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    mobile = db.Column(db.String(11), nullable=False, index=True)
+    mobile = db.Column(db.String(11), unique=True, nullable=False, index=True)
     token = db.Column(db.String(6), nullable=False, index=True)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
@@ -1511,7 +1511,7 @@ class Captcha(db.Model):
 
     @classmethod
     def get(cls, mobile):
-        res = cls.query.filter_by(mobile=mobile).first()
+        return cls.query.filter_by(mobile=mobile).first()
 
     @classmethod
     def create(cls, mobile):
@@ -1519,8 +1519,12 @@ class Captcha(db.Model):
         token = random.randint(100000, 999999)
         captcha = cls.get(mobile)
         if captcha:
+            if not captcha.deleted and datetime.now() - captcha.created_at < \
+                timedelta(seconds=app.config['EMY_TIMEDELTA_SECONDS']):
+                raise utils.APIException(utils.API_CODE_CAPTCHA_EXCEED_FREQUENCY)
             captcha.token = token
             captcha.delted = False
+            captcha.created_at = datetime.now()
         else:
             captcha = cls(
                 mobile=mobile,

@@ -48,6 +48,7 @@ EMY_URL = 'http://sdk4report.eucp.b2m.cn:8080/sdkproxy/sendsms.action'
 EMY_CDKEY = ''
 EMY_PASSWORD = ''
 EMY_MESSAGE = u'【房蜜】您的验证码为{}，感谢您使用房蜜。'
+EMY_TIMEDELTA_SECONDS = 60
 
 # The maximum content size when uploading.
 MAX_CONTENT_LENGTH = 16 * 1024 * 1024
