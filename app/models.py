@@ -1510,15 +1510,24 @@ class Captcha(db.Model):
         return True
 
     @classmethod
+    def get(cls, mobile):
+        res = cls.query.filter_by(mobile=mobile).first()
+
+    @classmethod
     def create(cls, mobile):
         utils.verify_mobile(mobile)
         token = random.randint(100000, 999999)
-        captcha = cls(
-            mobile=mobile,
-            token=token,
-        )
+        captcha = cls.get(mobile)
+        if captcha:
+            captcha.token = token
+            captcha.delted = False
+        else:
+            captcha = cls(
+                mobile=mobile,
+                token=token,
+            )
+            db.session.add(captcha)
         utils.send_captcha_sms(mobile, token)
-        db.session.add(captcha)
         db.session.commit()
         return captcha
 
