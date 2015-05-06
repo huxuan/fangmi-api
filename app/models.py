@@ -153,10 +153,19 @@ class User(db.Model):
         return self.birthday and self.birthday.isoformat()
 
     @classmethod
-    def getter(cls, username, password, *args, **kwargs):
-        user = cls.get(username)
-        if user.verify_password(password):
-            return user
+    def getter(cls, username, password, client, request, *args, **kwargs):
+        sns = getattr(request, 'sns')
+        if sns:
+            username = utils.get_sns_username(username, sns)
+            if utils.verify_sns_username_password(username, password, sns):
+                user = cls.get(username)
+                if not user:
+                    user = cls.create(username, password)
+                return user
+        else:
+            user = cls.get(username)
+            if user.verify_password(password):
+                return user
         return None
 
     @classmethod
