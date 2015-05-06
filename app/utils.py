@@ -28,6 +28,8 @@ API_CODE_NOT_AUTHORIZED = 202
 API_CODE_NOT_FOUND = 203
 API_CODE_REQUIRED = 204
 
+API_CODE_SNS_NOT_SUPPORTED = 301
+
 API_CODE_APARTMENT_NOT_FOUND = 1001
 API_CODE_APARTMENT_NOT_AUTHORIZED = 1002
 API_CODE_CAPTCHA_INVALID = 2001
@@ -88,6 +90,9 @@ API_CODE_MESSAGE = {
     API_CODE_NOT_AUTHORIZED: '您没有操作此{name}的权限。',
     API_CODE_NOT_FOUND: '{name}不存在。',
     API_CODE_REQUIRED: '{name}不能为空。',
+
+    API_CODE_SNS_NOT_SUPPORTED: '不支持{name}社交平台的登录。',
+
     API_CODE_APARTMENT_NOT_FOUND: '房屋不存在。',
     API_CODE_CAPTCHA_INVALID: u'验证码错误，请确认验证码输入正确。',
     API_CODE_CAPTCHA_NOT_FOUND: u'该手机号无对应验证码，请重新获取。',
@@ -294,3 +299,17 @@ def send_async_sms(mobile, message):
 def send_captcha_sms(mobile, captcha):
     message = app.config['EMY_MESSAGE'].format(captcha)
     return send_async_sms(mobile, message)
+
+
+def get_sns_username(username, sns):
+    return '_'.join([sns, username])
+
+
+def verify_sns_username_password(username, password, sns):
+    if sns == 'wechat':
+        url = 'https://api.weixin.qq.com/sns/auth'
+        params = {'access_token': password, 'openid': username}
+        res = requests.get(url, params=params)
+        return res.json()['errcode'] == 0
+    else:
+        raise APIException(API_CODE_SNS_NOT_SUPPORTED, name=sns)
