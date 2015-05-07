@@ -50,7 +50,7 @@ class User(db.Model):
     __tablename__ = 'users'
 
     # Authentication related.
-    username = db.Column(db.String(32), primary_key=True)
+    username = db.Column(db.String(128), primary_key=True)
     password_hash = db.Column(db.String(128), nullable=False)
 
     # Online Profile.
@@ -156,9 +156,9 @@ class User(db.Model):
     def getter(cls, username, password, client, request, *args, **kwargs):
         sns = getattr(request, 'sns')
         if sns:
-            username = utils.get_sns_username(username, sns)
             if utils.verify_sns_username_password(username, password, sns):
-                user = cls.get(username)
+                username = utils.get_sns_username(username, sns)
+                user = cls.get(username, nullable=True)
                 if not user:
                     user = cls.create(username, password)
                 return user
@@ -548,7 +548,7 @@ class Apartment(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(db.String(32), db.ForeignKey('users.username'))
+    username = db.Column(db.String(128), db.ForeignKey('users.username'))
     community_id = db.Column(db.Integer, db.ForeignKey('communities.id'))
 
     title = db.Column(db.String(64))
@@ -1119,7 +1119,7 @@ class Rent(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(db.String(32), db.ForeignKey('users.username'))
+    username = db.Column(db.String(128), db.ForeignKey('users.username'))
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
     room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'))
 
@@ -1214,7 +1214,7 @@ class Reserve(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(db.String(32), db.ForeignKey('users.username'))
+    username = db.Column(db.String(128), db.ForeignKey('users.username'))
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
     reserve_choice_id = db.Column(db.Integer,
         db.ForeignKey('reserve_choices.id'))
@@ -1312,8 +1312,8 @@ class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     key = db.Column(db.String(64), nullable=False, index=True)
-    from_username = db.Column(db.String(32), db.ForeignKey('users.username'))
-    to_username = db.Column(db.String(32), db.ForeignKey('users.username'))
+    from_username = db.Column(db.String(128), db.ForeignKey('users.username'))
+    to_username = db.Column(db.String(128), db.ForeignKey('users.username'))
 
     type = db.Column(db.SmallInteger)
     content = db.Column(db.Text)
@@ -1425,7 +1425,7 @@ class Comment(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(db.String(32), db.ForeignKey('users.username'))
+    username = db.Column(db.String(128), db.ForeignKey('users.username'))
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartments.id'))
 
     content = db.Column(db.Text)
@@ -1592,7 +1592,7 @@ class Token(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(db.String(32), db.ForeignKey('users.username'))
+    username = db.Column(db.String(128), db.ForeignKey('users.username'))
     client_id = db.Column(db.String(64), db.ForeignKey('clients.client_id'))
 
     access_token = db.Column(db.String(255), unique=True, index=True)
@@ -1641,7 +1641,7 @@ class Token(db.Model):
 class Admin(db.Model):
     __tablename__ = 'admins'
 
-    username = db.Column(db.String(32), primary_key=True)
+    username = db.Column(db.String(128), primary_key=True)
     password_hash = db.Column(db.String(128), nullable=False)
 
     created_at = db.Column(db.DateTime, default=datetime.now)
