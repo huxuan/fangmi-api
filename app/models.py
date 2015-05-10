@@ -1268,6 +1268,7 @@ class Reserve(db.Model):
         if filter_deleted:
             res = res.filter_by(deleted=False)
         res = res.all()
+        res = filter(lambda x: x.reserve_choice.apartment_id, res)
         return res
 
     def set(self, **kwargs):
