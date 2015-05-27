@@ -36,6 +36,7 @@ from app.reserve_choice import reserve_choice
 from app.school import school
 from app.uploads import uploads
 from app.user import user
+from app.wechat import bp_wechat
 
 app.register_blueprint(account, url_prefix='/api/account')
 app.register_blueprint(apartment, url_prefix='/api/apartment')
@@ -50,6 +51,7 @@ app.register_blueprint(reserve_choice, url_prefix='/api/reserve_choice')
 app.register_blueprint(school, url_prefix='/api/school')
 app.register_blueprint(uploads, url_prefix='/uploads')
 app.register_blueprint(user, url_prefix='/api/user')
+app.register_blueprint(bp_wechat, url_prefix='/api/wechat')
 
 # NOTE(huxuan): Use Flask's error handler instead of the one in flask-restful.
 app.handle_exception = partial(Flask.handle_exception, app)
