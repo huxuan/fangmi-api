@@ -157,7 +157,7 @@ class Argument(reqparse.Argument):
             raise error
         raise APIException(API_CODE_INVALID, name=self.name)
 
-    def parse(self, request):
+    def parse(self, request, dummy=False):
         result, _found = super(Argument, self).parse(request)
         if not result and self.required:
             raise APIException(API_CODE_REQUIRED, name=self.name)
