@@ -76,6 +76,7 @@ class ListAPI(Resource):
         parser = self.parser.copy()
         parser.add_argument('username')
         parser.add_argument('apartment_id', type=int)
+        parser.add_argument('reserve_choice_id', type=int)
         args = parser.parse_args(request)
         reserves = models.Reserve.gets(**args)
         models.Reserve.is_accessible(reserves, request.oauth.user.username)

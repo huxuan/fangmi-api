@@ -1263,12 +1263,15 @@ class Reserve(db.Model):
         return res
 
     @classmethod
-    def gets(cls, username=None, apartment_id=None, filter_deleted=True):
+    def gets(cls, username=None, apartment_id=None, reserve_choice_id=None,
+        filter_deleted=True):
         res = cls.query
         if username:
             res = res.filter_by(username=username)
         if apartment_id:
             res = res.filter_by(apartment_id=apartment_id)
+        if reserve_choice_id:
+            res = res.filter_by(reserve_choice_id=reserve_choice_id)
         if filter_deleted:
             res = res.filter_by(deleted=False)
         res = res.all()
