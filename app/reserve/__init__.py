@@ -78,8 +78,7 @@ class ListAPI(Resource):
         parser.add_argument('apartment_id', type=int)
         args = parser.parse_args(request)
         reserves = models.Reserve.gets(**args)
-        for reserve in reserves:
-            reserve.verify_owner(request.oauth.user.username)
+        models.Reserve.is_accessible(reserves, request.oauth.user.username)
         payload = dict(
             reserves=[reserve.serialize() for reserve in reserves],
         )

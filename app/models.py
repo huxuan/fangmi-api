@@ -1288,6 +1288,15 @@ class Reserve(db.Model):
                 name=self.__tablename__)
         return True
 
+    @classmethod
+    def is_accessible(cls, reserves, username):
+        for reserve in reserves:
+            if reserve.username == username or \
+                reserve.reserve_choice.apartment.username == username:
+                return True
+        raise utils.APIException(utils.API_CODE_NOT_AUTHORIZED,
+            name=cls.__tablename__)
+
     def serialize(self):
         return dict(
             id=self.id,
