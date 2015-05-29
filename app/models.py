@@ -762,6 +762,8 @@ class Apartment(db.Model):
             community_ids = [community.id
                 for community in school.community_list]
             res = res.filter(Apartment.community_id.in_(community_ids))
+        if q:
+            res = res.whoosh_search(q)
         if filter_cancelled:
             res = res.filter_by(cancelled=False)
         if filter_deleted:
