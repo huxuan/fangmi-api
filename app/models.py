@@ -64,7 +64,7 @@ class User(db.Model):
 
     # Personal Information.
     real_name = db.Column(db.String(16))
-    mobile = db.Column(db.String(11), default=username)
+    mobile = db.Column(db.String(11))
     id_number = db.Column(db.String(18))
     school = db.Column(db.String(32))
     major = db.Column(db.String(32))
@@ -174,6 +174,8 @@ class User(db.Model):
             username=username,
             password=password,
         )
+        if utils.verify_mobile(username):
+            user.mobile = username
         db.session.add(user)
         db.session.commit()
         return user
@@ -1527,7 +1529,8 @@ class Captcha(db.Model):
 
     @classmethod
     def create(cls, mobile):
-        utils.verify_mobile(mobile)
+        if not utils.verify_mobile(mobile):
+            raise utils.APIException(utils.API_CODE_INVALID, name='mobile')
         token = random.randint(100000, 999999)
         captcha = cls.get(mobile)
         if captcha:

@@ -280,8 +280,7 @@ MOBILE_PATTERN = re.compile("^1[34578]\d{9}$")
 def verify_mobile(mobile):
     if MOBILE_PATTERN.match(mobile):
         return True
-    else:
-        raise APIException(API_CODE_INVALID, name='mobile')
+    return False
 
 
 @async
