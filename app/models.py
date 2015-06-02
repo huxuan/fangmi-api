@@ -646,7 +646,7 @@ class Apartment(db.Model):
 
     @photos.setter
     def photos(self, photos):
-        if photos:
+        if photos and photos[0]:
             self.photo_list = [
                 Photo.create(
                     self.id,
