@@ -474,6 +474,10 @@ class Community(db.Model):
     def apartments(self):
         return [apartment.serialize() for apartment in self.apartment_list]
 
+    @property
+    def num_apartments(self):
+        return self.apartment_list.count()
+
     @classmethod
     def create(cls, name, address, traffic, map):
         community = cls(
@@ -547,6 +551,7 @@ class Community(db.Model):
             map=self.map,
             schools=self.schools,
             #apartments=self.apartments,
+            num_apartments=self.num_apartments,
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
         )
