@@ -8,4 +8,5 @@ flask-sqlalchemy
 flask-whooshalchemy
 jieba
 mysql-python
+sphinx
 uwsgi
