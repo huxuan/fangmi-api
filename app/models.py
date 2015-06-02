@@ -1569,7 +1569,7 @@ class Captcha(db.Model):
                 timedelta(seconds=app.config['EMY_TIMEDELTA_SECONDS']):
                 raise utils.APIException(utils.API_CODE_CAPTCHA_EXCEED_FREQUENCY)
             captcha.token = token
-            captcha.delted = False
+            captcha.deleted = False
             captcha.created_at = datetime.now()
         else:
             captcha = cls(
