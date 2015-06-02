@@ -352,6 +352,13 @@ class School(db.Model):
         self.community_list = communities
         db.session.commit()
 
+    @property
+    def num_apartments(self):
+        community_ids = [community.id
+            for community in self.community_list]
+        res = Apartment.query.filter(Apartment.community_id.in_(community_ids))
+        return res.count()
+
     @classmethod
     def create(cls, name, avatar, image):
         school = cls(
@@ -421,6 +428,7 @@ class School(db.Model):
             avatar=self.avatar,
             image=self.image,
             #communities=self.communities,
+            num_apartments=self.num_apartments,
             created_at=self.created_at.isoformat(),
             deleted=self.deleted,
         )
