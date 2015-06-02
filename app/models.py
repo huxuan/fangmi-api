@@ -615,14 +615,15 @@ class Apartment(db.Model):
 
     @comments.setter
     def comments(self, comments):
-        self.comment_list = [
-            Comment.create(
-                comment['username'],
-                self.id,
-                comment['content'],
-                comment['rate'],
-            ) for comment in comments]
-        db.session.commit()
+        if comments:
+            self.comment_list = [
+                Comment.create(
+                    comment['username'],
+                    self.id,
+                    comment['content'],
+                    comment['rate'],
+                ) for comment in comments]
+            db.session.commit()
 
     @property
     def devices(self):
@@ -630,13 +631,14 @@ class Apartment(db.Model):
 
     @devices.setter
     def devices(self, devices):
-        self.device_list = [
-            Device.create(
-                self.id,
-                device['name'],
-                device.get('count', None),
-            ) for device in devices]
-        db.session.commit()
+        if devices:
+            self.device_list = [
+                Device.create(
+                    self.id,
+                    device['name'],
+                    device.get('count', None),
+                ) for device in devices]
+            db.session.commit()
 
     @property
     def photos(self):
@@ -644,12 +646,13 @@ class Apartment(db.Model):
 
     @photos.setter
     def photos(self, photos):
-        self.photo_list = [
-            Photo.create(
-                self.id,
-                photo,
-            ) for photo in photos]
-        db.session.commit()
+        if photos:
+            self.photo_list = [
+                Photo.create(
+                    self.id,
+                    photo,
+                ) for photo in photos]
+            db.session.commit()
 
     @property
     def reserve_choices(self):
@@ -658,14 +661,15 @@ class Apartment(db.Model):
 
     @reserve_choices.setter
     def reserve_choices(self, reserve_choices):
-        self.reserve_choice_list = [
-            ReserveChoice.create(
-                self.id,
-                reserve_choice['date'],
-                reserve_choice['time_start'],
-                reserve_choice['time_end'],
-            ) for reserve_choice in reserve_choices]
-        db.session.commit()
+        if reserve_choices:
+            self.reserve_choice_list = [
+                ReserveChoice.create(
+                    self.id,
+                    reserve_choice['date'],
+                    reserve_choice['time_start'],
+                    reserve_choice['time_end'],
+                ) for reserve_choice in reserve_choices]
+            db.session.commit()
 
     @property
     def rooms(self):
@@ -673,15 +677,16 @@ class Apartment(db.Model):
 
     @rooms.setter
     def rooms(self, rooms):
-        self.room_list = [
-            Room.create(
-                self.id,
-                room['name'],
-                room['area'],
-                room['price'],
-                room['date_entrance'],
-            ) for room in rooms]
-        db.session.commit()
+        if rooms:
+            self.room_list = [
+                Room.create(
+                    self.id,
+                    room['name'],
+                    room['area'],
+                    room['price'],
+                    room['date_entrance'],
+                ) for room in rooms]
+            db.session.commit()
 
     @property
     def tags(self):
@@ -689,11 +694,12 @@ class Apartment(db.Model):
 
     @tags.setter
     def tags(self, tags):
-        self.tag_list = [
-            Tag.create(
-                tag['name'],
-            ) for tag in tags]
-        db.session.commit()
+        if tags:
+            self.tag_list = [
+                Tag.create(
+                    tag['name'],
+                ) for tag in tags]
+            db.session.commit()
 
     @property
     def num_fav_users(self):
