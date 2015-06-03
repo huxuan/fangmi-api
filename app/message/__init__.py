@@ -38,6 +38,33 @@ class MessageAPI(Resource):
 
     @oauth.require_oauth()
     def get(self):
+        """ 获取单条信息
+
+        **Example Request**:
+
+        .. sourcecode:: http
+
+            GET /api/message?id=1
+            Authorization: Bearer YSj3GtbBvEWmFkL0hhH26PWQrpbSef
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+            {
+                "message": "OK",
+                "status_code": 200,
+                "message_item": {
+                    ...
+                }
+            }
+
+        :<header Authorization: OAuth access_token，只有发件人和收件人才有权限
+        :query int id: **Required** 消息 ID
+        :>json string message: 可能的错误信息
+        :>json int status_code: 状态代码
+        :>json object message_item: 消息的 serialize 信息
+        """
         parser = self.parser.copy()
         parser.add_argument('id', type=int, required=True)
         args = parser.parse_args(request)
@@ -51,6 +78,61 @@ class MessageAPI(Resource):
 
     @oauth.require_oauth()
     def post(self):
+        """ 发送一条消息
+
+        **Example Request**:
+
+        .. sourcecode:: http
+
+            POST /api/message
+            Authorization: Bearer YSj3GtbBvEWmFkL0hhH26PWQrpbSef
+            to_username=u2&type=1&content=message_content
+
+            POST /api/message
+            Authorization: Bearer YSj3GtbBvEWmFkL0hhH26PWQrpbSef
+            Content-Type: multipart/form-data; boundary=AaB03x
+
+            --AaB03x
+            Content-Disposition: form-data; name="to_username"
+
+            u2
+            --AaB03x
+            Content-Disposition: form-data; name="type"
+
+            2
+            --AaB03x
+            Content-Disposition: form-data; name="content"
+            Content-Type: image/jpeg
+            Content-Transfer-Encoding: binary
+
+            ... contents of content ...
+            --AaB03x--
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+            {
+                "message": "OK",
+                "status_code": 200,
+                "messages": [
+                    {
+                        ...
+                    },
+                    {
+                        ...
+                    },
+                    ...
+                ]
+            }
+
+        :<header Authorization: OAuth access_token
+        :form id: 收藏房屋的 ID
+        :query string action: ``append`` （添加） 或者 ``remove`` （删除）
+        :>json string message: 可能的错误信息
+        :>json int status_code: 状态代码
+        :>json array messages: 消息列表的 serialize 信息
+        """
         parser = self.parser.copy()
         parser.add_argument('to_username', required=True)
         parser.add_argument('type', type=int, required=True)
@@ -71,6 +153,40 @@ class ListAPI(Resource):
 
     @oauth.require_oauth()
     def get(self):
+        """ 获取消息列表
+
+        **Example Request**:
+
+        .. sourcecode:: http
+
+            GET /api/message/list?from_username=u1&filter_unread=True
+            Authorization: Bearer YSj3GtbBvEWmFkL0hhH26PWQrpbSef
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+            {
+                "message": "OK",
+                "status_code": 200,
+                "messages": [
+                    {
+                        ...
+                    },
+                    {
+                        ...
+                    },
+                    ...
+                ]
+            }
+
+        :<header Authorization: OAuth access_token，只有发件人和收件人才有权限
+        :query string from_username: **Required** 聊天对象用户名
+        :query boolean filter_unread: 是否筛选未读条目，默认为 True
+        :>json string message: 可能的错误信息
+        :>json int status_code: 状态代码
+        :>json array messages: 消息列表的 serialize 信息
+        """
         parser = self.parser.copy()
         parser.add_argument('from_username', required=True)
         parser.add_argument('filter_unread', type=inputs.boolean, default=True)
@@ -87,6 +203,39 @@ class ConversationAPI(Resource):
 
     @oauth.require_oauth()
     def get(self):
+        """ 获取对话列表
+
+        **Example Request**:
+
+        .. sourcecode:: http
+
+            GET /api/message/conversation
+            Authorization: Bearer YSj3GtbBvEWmFkL0hhH26PWQrpbSef
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+            {
+                "message": "OK",
+                "status_code": 200,
+                "conversations": [
+                    {
+                        ...
+                    },
+                    {
+                        ...
+                    },
+                    ...
+                ]
+            }
+
+        :<header Authorization: OAuth access_token
+        :>json string message: 可能的错误信息
+        :>json int status_code: 状态代码
+        :>json array conversations: 对话列表的 serialize 信息，\
+每条为该对话的最新一条消息
+        """
         payload = dict(
             conversations = request.oauth.user.get_conversion(),
         )

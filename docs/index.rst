@@ -13,6 +13,7 @@ Welcome to fangmi-api's documentation!
     app.apartment
     app.captcha
     app.community
+    app.message
 
 
 Indices and tables
