@@ -27,6 +27,28 @@ api = Api(captcha)
 class CaptchaAPI(Resource):
 
     def post(self):
+        """ 发送验证码
+
+        **Example Request**:
+
+        .. sourcecode:: http
+
+            POST /api/captcha
+            mobile=1
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+            {
+                "message": "OK",
+                "status_code": 200,
+            }
+
+        :query string mobile: 手机号
+        :>json string message: 可能的错误信息
+        :>json int status_code: 状态代码
+        """
         parser = reqparse.RequestParser()
         parser.add_argument('mobile', required=True)
         args = parser.parse_args(request)

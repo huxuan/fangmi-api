@@ -11,6 +11,7 @@ Welcome to fangmi-api's documentation!
 
     app.account
     app.apartment
+    app.captcha
 
 
 Indices and tables
