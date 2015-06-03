@@ -516,7 +516,7 @@ q=test&filter_cancelled=true&filter_deleted=false&limit=10
         :query int limit: 返回结果数目上限
         :>json string message: 可能的错误信息
         :>json int status_code: 状态代码
-        :>json array apartments: 收藏房屋列表的 serialize 信息
+        :>json array apartments: 房屋列表的 serialize 信息
         """
         args = self.parser.parse_args(request)
         payload = dict(
