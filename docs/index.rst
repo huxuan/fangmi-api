@@ -14,6 +14,7 @@ Welcome to fangmi-api's documentation!
     app.captcha
     app.community
     app.message
+    app.oauth
 
 
 Indices and tables
