@@ -112,7 +112,7 @@ class ListAPI(Resource):
 class SearchAPI(Resource):
     @oauth.require_oauth()
     def get(self):
-        """ 搜索小区列表
+        """ 搜索小区
 
         **Example Request**:
 
