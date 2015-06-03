@@ -10,6 +10,7 @@ Welcome to fangmi-api's documentation!
     :maxdepth: 2
 
     app.account
+    app.apartment
 
 
 Indices and tables
