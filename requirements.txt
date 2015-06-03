@@ -9,4 +9,5 @@ flask-whooshalchemy
 jieba
 mysql-python
 sphinx
+sphinxcontrib-httpdomain
 uwsgi
