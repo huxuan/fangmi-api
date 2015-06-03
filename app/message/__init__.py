@@ -60,7 +60,8 @@ class MessageAPI(Resource):
             }
 
         :<header Authorization: OAuth access_token，只有发件人和收件人才有权限
-        :query int id: **Required** 消息 ID
+        :param id: **Required** 消息 ID
+        :type id: int
         :>json string message: 可能的错误信息
         :>json int status_code: 状态代码
         :>json object message_item: 消息的 serialize 信息
@@ -86,7 +87,21 @@ class MessageAPI(Resource):
 
             POST /api/message
             Authorization: Bearer YSj3GtbBvEWmFkL0hhH26PWQrpbSef
-            to_username=u2&type=1&content=message_content
+            Content-Type: multipart/form-data; boundary=AaB03x
+
+            --AaB03x
+            Content-Disposition: form-data; name="to_username"
+
+            u2
+            --AaB03x
+            Content-Disposition: form-data; name="type"
+
+            1
+            --AaB03x
+            Content-Disposition: form-data; name="content"
+
+            message_content
+            --AaB03x--
 
             POST /api/message
             Authorization: Bearer YSj3GtbBvEWmFkL0hhH26PWQrpbSef
@@ -128,7 +143,8 @@ class MessageAPI(Resource):
 
         :<header Authorization: OAuth access_token
         :form id: 收藏房屋的 ID
-        :query string action: ``append`` （添加） 或者 ``remove`` （删除）
+        :form type: 消息类型，1: 文本，2：图片
+        :form content: 消息内容，文本消息对应文本内容，图片消息对应图片文件
         :>json string message: 可能的错误信息
         :>json int status_code: 状态代码
         :>json array messages: 消息列表的 serialize 信息
@@ -181,8 +197,10 @@ class ListAPI(Resource):
             }
 
         :<header Authorization: OAuth access_token，只有发件人和收件人才有权限
-        :query string from_username: **Required** 聊天对象用户名
-        :query boolean filter_unread: 是否筛选未读条目，默认为 True
+        :param from_username: **Required** 聊天对象用户名
+        :type from_username: string
+        :param filter_unread: 是否筛选未读条目，默认为 True
+        :type filter_unread: boolean
         :>json string message: 可能的错误信息
         :>json int status_code: 状态代码
         :>json array messages: 消息列表的 serialize 信息

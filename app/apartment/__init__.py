@@ -448,8 +448,8 @@ class FavoriteAPI(Resource):
             }
 
         :<header Authorization: OAuth access_token
-        :form int id: 收藏房屋的 ID
-        :form string action: ``append`` （添加） 或者 ``remove`` （删除）
+        :query int id: 收藏房屋的 ID
+        :query string action: ``append`` （添加） 或者 ``remove`` （删除）
         :>json string message: 可能的错误信息
         :>json int status_code: 状态代码
         :>json array apartments: 收藏房屋列表的 serialize 信息
