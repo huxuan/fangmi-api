@@ -198,7 +198,7 @@ class ApartmentAPI(Resource):
 
         .. sourcecode:: http
 
-            PUT /api/apartment
+            POST /api/apartment
             Authorization: Bearer YSj3GtbBvEWmFkL0hhH26PWQrpbSef
             Content-Type: application/json
 
@@ -313,13 +313,13 @@ class PhotosAPI(Resource):
 
             1
             --AaB03x
-            Content-Disposition: form-data; name="contract";
+            Content-Disposition: form-data; name="contract"
             Content-Type: image/jpeg
             Content-Transfer-Encoding: binary
 
             ... contents of contract ...
             --AaB03x
-            Content-Disposition: form-data; name="photos";
+            Content-Disposition: form-data; name="photos"
             Content-Type: multipart/mixed; boundary=BbC04y
 
             --BbC04y
@@ -448,8 +448,8 @@ class FavoriteAPI(Resource):
             }
 
         :<header Authorization: OAuth access_token
-        :query int id: 收藏房屋的 ID
-        :query string action: ``append`` （添加） 或者 ``remove`` （删除）
+        :form int id: 收藏房屋的 ID
+        :form string action: ``append`` （添加） 或者 ``remove`` （删除）
         :>json string message: 可能的错误信息
         :>json int status_code: 状态代码
         :>json array apartments: 收藏房屋列表的 serialize 信息

@@ -99,7 +99,7 @@ class AccountAPI(Resource):
 
             new_status
             --AaB03x
-            Content-Disposition: form-data; name="avatar";
+            Content-Disposition: form-data; name="avatar"
             Content-Type: image/jpeg
             Content-Transfer-Encoding: binary
 
