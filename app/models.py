@@ -176,6 +176,7 @@ class User(db.Model):
         )
         if utils.verify_mobile(username):
             user.mobile = username
+        user.nickname = username[:16]
         db.session.add(user)
         db.session.commit()
         return user
