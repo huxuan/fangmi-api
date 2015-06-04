@@ -4,14 +4,14 @@ API 接口
 .. toctree::
     :maxdepth: 2
 
-    app.account
-    app.apartment
-    app.captcha
-    app.community
-    app.message
-    app.oauth
-    app.rent
-    app.reserve
-    app.reserve_choice
-    app.school
-    app.user
+    api.account
+    api.apartment
+    api.captcha
+    api.community
+    api.message
+    api.oauth
+    api.rent
+    api.reserve
+    api.reserve_choice
+    api.school
+    api.user
