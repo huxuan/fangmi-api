@@ -52,8 +52,7 @@ class CommunityAPI(Resource):
             }
 
         :<header Authorization: OAuth access_token
-        :param id: **Required** 小区 ID
-        :type id: int
+        :param int id: **Required** 小区 ID
         :>json string message: 可能的错误信息
         :>json int status_code: 状态代码
         :>json object community: 小区的 serialize 信息
@@ -141,8 +140,7 @@ class SearchAPI(Resource):
             }
 
         :<header Authorization: OAuth access_token
-        :param q: **Required** 检索关键词
-        :type q: string
+        :param string q: **Required** 检索关键词
         :>json string message: 可能的错误信息
         :>json int status_code: 状态代码
         :>json array communities: 小区列表的 serialize 信息

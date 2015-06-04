@@ -49,8 +49,7 @@ class ReserveChoiceAPI(Resource):
                 }
             }
 
-        :param id: **Required** 预约选项 ID
-        :type id: int
+        :param int id: **Required** 预约选项 ID
         :>json string message: 可能的错误信息
         :>json int status_code: 状态代码
         :>json object reserve_choice: 预约选项的 serialize 信息
@@ -144,8 +143,7 @@ class ListAPI(Resource):
                 ]
             }
 
-        :param apartment_id: 房屋 ID，用于筛选某一房屋的所有预约选项
-        :type apartment_id: int
+        :param int apartment_id: 房屋 ID，用于筛选某一房屋的所有预约选项
         :>json string message: 可能的错误信息
         :>json int status_code: 状态代码
         :>json array reserve_choices: 预约选项列表的 serialize 信息

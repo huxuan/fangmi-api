@@ -60,8 +60,7 @@ class MessageAPI(Resource):
             }
 
         :<header Authorization: OAuth access_token，只有发件人和收件人才有权限
-        :param id: **Required** 消息 ID
-        :type id: int
+        :param int id: **Required** 消息 ID
         :>json string message: 可能的错误信息
         :>json int status_code: 状态代码
         :>json object message_item: 消息的 serialize 信息
@@ -197,10 +196,8 @@ class ListAPI(Resource):
             }
 
         :<header Authorization: OAuth access_token，只有发件人和收件人才有权限
-        :param from_username: **Required** 聊天对象用户名
-        :type from_username: string
-        :param filter_unread: 是否筛选未读条目，默认为 True
-        :type filter_unread: boolean
+        :param string from_username: **Required** 聊天对象用户名
+        :param boolean filter_unread: 是否筛选未读条目，默认为 True
         :>json string message: 可能的错误信息
         :>json int status_code: 状态代码
         :>json array messages: 消息列表的 serialize 信息
