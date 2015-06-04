@@ -16,6 +16,7 @@ Welcome to fangmi-api's documentation!
     app.message
     app.oauth
     app.rent
+    app.reserve
 
 
 Indices and tables
