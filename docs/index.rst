@@ -17,6 +17,7 @@ Welcome to fangmi-api's documentation!
     app.oauth
     app.rent
     app.reserve
+    app.reserve_choice
 
 
 Indices and tables

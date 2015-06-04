@@ -29,6 +29,32 @@ class ReserveChoiceAPI(Resource):
         self.parser = reqparse.RequestParser()
 
     def get(self):
+        """ 获取预约选项信息
+
+        **Example Request**:
+
+        .. sourcecode:: http
+
+            GET /api/reserve_choice?id=1
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+            {
+                "message": "OK",
+                "status_code": 200,
+                "reserve_choice": {
+                    ...
+                }
+            }
+
+        :param id: **Required** 预约选项 ID
+        :type id: int
+        :>json string message: 可能的错误信息
+        :>json int status_code: 状态代码
+        :>json object reserve_choice: 预约选项的 serialize 信息
+        """
         parser = self.parser.copy()
         parser.add_argument('id', type=int, required=True)
         args = parser.parse_args(request)
@@ -41,6 +67,38 @@ class ReserveChoiceAPI(Resource):
 
     @oauth.require_oauth()
     def post(self):
+        """ 新建预约选项
+
+        **Example Request**:
+
+        .. sourcecode:: http
+
+            POST /api/reserve_choice
+            Authorization: Bearer YSj3GtbBvEWmFkL0hhH26PWQrpbSef
+            apartment_id=1&date=2015-05-01&time_start=12:34:56&time_end=12:56:34
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+            {
+                "message": "OK",
+                "status_code": 200,
+                "reserve_choice": {
+                    ...
+                }
+            }
+
+        :<header Authorization: OAuth access_token, 只有房东才有权限
+        :query int apartment_id: **Required** 租房对应的房屋 ID\
+（注意是 Apartment 的，不是 Room 的）
+        :query date date: **Required** 预约日期
+        :query time time_start: **Required** 预约开始时间
+        :query time time_end: **Required** 预约结束时间
+        :>json string message: 可能的错误信息
+        :>json int status_code: 状态代码
+        :>json object reserve_choice: 预约选项的 serialize 信息
+        """
         parser = self.parser.copy()
         parser.add_argument('apartment_id', type=int, required=True)
         parser.add_argument('date', type=utils.strpdate, required=True)
@@ -61,6 +119,38 @@ class ListAPI(Resource):
         self.parser = reqparse.RequestParser()
 
     def get(self):
+        """ 获取预约选项列表信息
+
+        **Example Request**:
+
+        .. sourcecode:: http
+
+            GET /api/reserve_choice/list?apartment_id=1
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+            {
+                "message": "OK",
+                "status_code": 200,
+                "reserve_choices": [
+                    {
+                        ...
+                    },
+                    {
+                        ...
+                    },
+                    ...
+                ]
+            }
+
+        :param apartment_id: 房屋 ID，用于筛选某一房屋的所有预约选项
+        :type apartment_id: int
+        :>json string message: 可能的错误信息
+        :>json int status_code: 状态代码
+        :>json array reserve_choices: 预约选项列表的 serialize 信息
+        """
         parser = self.parser.copy()
         parser.add_argument('apartment_id', type=int, required=True)
         args = parser.parse_args(request)
