@@ -68,6 +68,8 @@ class ListAPI(Resource):
         if args.get('apartment_id'):
             apartment = models.Apartment.get(args['apartment_id'])
             apartment.verify_owner(request.oauth.user.username)
+        else:
+            args['username'] = request.oauth.user.username
         payload = dict(
             rents=[rent.serialize()
                 for rent in models.Rent.gets(**args)],
