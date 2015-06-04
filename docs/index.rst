@@ -15,6 +15,7 @@ Welcome to fangmi-api's documentation!
     app.community
     app.message
     app.oauth
+    app.rent
 
 
 Indices and tables

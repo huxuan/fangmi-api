@@ -30,6 +30,34 @@ class RentAPI(Resource):
 
     @oauth.require_oauth()
     def get(self):
+        """ 获取租房记录信息
+
+        **Example Request**:
+
+        .. sourcecode:: http
+
+            GET /api/rent
+            Authorization: Bearer YSj3GtbBvEWmFkL0hhH26PWQrpbSef
+            id=1
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+            {
+                "message": "OK",
+                "status_code": 200,
+                "rent": {
+                    ...
+                }
+            }
+
+        :<header Authorization: OAuth access_token
+        :query int id: **Required** 租房记录 ID
+        :>json string message: 可能的错误信息
+        :>json int status_code: 状态代码
+        :>json object rent: 租房记录的 serialize 信息
+        """
         parser = self.parser.copy()
         parser.add_argument('id', type=int, required=True)
         args = parser.parse_args(request)
@@ -43,6 +71,37 @@ class RentAPI(Resource):
 
     @oauth.require_oauth()
     def post(self):
+        """ 新建租房记录
+
+        **Example Request**:
+
+        .. sourcecode:: http
+
+            POST /api/rent
+            Authorization: Bearer YSj3GtbBvEWmFkL0hhH26PWQrpbSef
+            room_id=1&date_start=2015-05-01&date_end=2016-05-01
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+            {
+                "message": "OK",
+                "status_code": 200,
+                "rent": {
+                    ...
+                }
+            }
+
+        :<header Authorization: OAuth access_token
+        :query int romm_id: **Required** 租房对应的房间 ID（注意是Room的，\
+不是Apartment的）
+        :query date date_start: **Required** 租房开始时间
+        :query date date_end: **Required** 租房结束时间
+        :>json string message: 可能的错误信息
+        :>json int status_code: 状态代码
+        :>json object rent: 租房记录的 serialize 信息
+        """
         parser = self.parser.copy()
         parser.add_argument('room_id', type=int, required=True)
         parser.add_argument('date_start', type=utils.strpdate, required=True)
@@ -62,6 +121,46 @@ class ListAPI(Resource):
 
     @oauth.require_oauth()
     def get(self):
+        """ 获取租房记录列表信息
+
+        如果不传 ``apartment_id`` 获得的是已登录用户自己的租房记录列表，
+        如果传的话获得的是某间房屋的租房记录列表（只有房东才有权限）
+
+        **Example Request**:
+
+        .. sourcecode:: http
+
+            GET /api/rent/list
+            Authorization: Bearer YSj3GtbBvEWmFkL0hhH26PWQrpbSef
+
+            GET /api/rent/list
+            Authorization: Bearer YSj3GtbBvEWmFkL0hhH26PWQrpbSef
+            apartment_id=1
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+            {
+                "message": "OK",
+                "status_code": 200,
+                "rents": [
+                    {
+                        ...
+                    },
+                    {
+                        ...
+                    },
+                    ...
+                ]
+            }
+
+        :<header Authorization: OAuth access_token
+        :query int apartment_id: 租房记录 ID
+        :>json string message: 可能的错误信息
+        :>json int status_code: 状态代码
+        :>json array rents: 租房记录列表的 serialize 信息
+        """
         parser = self.parser.copy()
         parser.add_argument('apartment_id', type=int)
         args = parser.parse_args(request)
