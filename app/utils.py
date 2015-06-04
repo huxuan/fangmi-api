@@ -301,7 +301,7 @@ def send_captcha_sms(mobile, captcha):
 
 
 def get_sns_username(username, sns):
-    return '_'.join([sns, username])[:16]
+    return '_'.join([sns, username])
 
 
 def verify_sns_username_password(username, password, sns):
