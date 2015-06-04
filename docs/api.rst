@@ -14,3 +14,4 @@ API 接口
     app.reserve
     app.reserve_choice
     app.school
+    app.user
