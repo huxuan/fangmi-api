@@ -29,6 +29,31 @@ class SchoolAPI(Resource):
         self.parser = reqparse.RequestParser()
 
     def get(self):
+        """ 获取学校信息
+
+        **Example Request**:
+
+        .. sourcecode:: http
+
+            GET /api/school?id=1
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+            {
+                "message": "OK",
+                "status_code": 200,
+                "school": {
+                    ...
+                }
+            }
+
+        :param int id: **Required** 学校 ID
+        :>json string message: 可能的错误信息
+        :>json int status_code: 状态代码
+        :>json object school: 学校的 serialize 信息
+        """
         parser = self.parser.copy()
         parser.add_argument('id', type=int, required=True)
         args = parser.parse_args(request)
@@ -41,6 +66,36 @@ class SchoolAPI(Resource):
 
 class ListAPI(Resource):
     def get(self):
+        """ 获取学校列表
+
+        **Example Request**:
+
+        .. sourcecode:: http
+
+            GET /api/school/list
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+            {
+                "message": "OK",
+                "status_code": 200,
+                "schools": [
+                    {
+                        ...
+                    },
+                    {
+                        ...
+                    },
+                    ...
+                ]
+            }
+
+        :>json string message: 可能的错误信息
+        :>json int status_code: 状态代码
+        :>json array schools: 学校列表的 serialize 信息
+        """
         payload = dict(
             schools=[school.serialize()
                 for school in models.School.gets()],
@@ -50,6 +105,37 @@ class ListAPI(Resource):
 
 class SearchAPI(Resource):
     def get(self):
+        """ 搜索学校
+
+        **Example Request**:
+
+        .. sourcecode:: http
+
+            GET /api/school/search?q=test
+
+        **Example Response**:
+
+        .. sourcecode:: http
+
+            {
+                "message": "OK",
+                "status_code": 200,
+                "schools": [
+                    {
+                        ...
+                    },
+                    {
+                        ...
+                    },
+                    ...
+                ]
+            }
+
+        :param string q: **Required** 检索关键词
+        :>json string message: 可能的错误信息
+        :>json int status_code: 状态代码
+        :>json array schools: 学校列表的 serialize 信息
+        """
         parser = reqparse.RequestParser()
         parser.add_argument('q', required=True)
         args = parser.parse_args(request)

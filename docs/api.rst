@@ -13,4 +13,4 @@ API 接口
     app.rent
     app.reserve
     app.reserve_choice
-
+    app.school
