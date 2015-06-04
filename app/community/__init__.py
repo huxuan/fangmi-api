@@ -52,10 +52,11 @@ class CommunityAPI(Resource):
             }
 
         :<header Authorization: OAuth access_token
-        :query int id: **Required** 小区 ID
+        :param id: **Required** 小区 ID
+        :type id: int
         :>json string message: 可能的错误信息
         :>json int status_code: 状态代码
-        :>json object apartment: 小区的 serialize 信息
+        :>json object community: 小区的 serialize 信息
         """
         parser = self.parser.copy()
         parser.add_argument('id', type=int, required=True)
@@ -100,7 +101,7 @@ class ListAPI(Resource):
         :<header Authorization: OAuth access_token
         :>json string message: 可能的错误信息
         :>json int status_code: 状态代码
-        :>json array apartments: 小区列表的 serialize 信息
+        :>json array communities: 小区列表的 serialize 信息
         """
         payload = dict(
             communities=[community.serialize()
@@ -140,10 +141,11 @@ class SearchAPI(Resource):
             }
 
         :<header Authorization: OAuth access_token
-        :query string q: **Required** 检索关键词
+        :param q: **Required** 检索关键词
+        :type q: string
         :>json string message: 可能的错误信息
         :>json int status_code: 状态代码
-        :>json array apartments: 小区列表的 serialize 信息
+        :>json array communities: 小区列表的 serialize 信息
         """
         parser = reqparse.RequestParser()
         parser.add_argument('q', required=True)
