@@ -9,15 +9,7 @@ Welcome to fangmi-api's documentation!
 .. toctree::
     :maxdepth: 2
 
-    app.account
-    app.apartment
-    app.captcha
-    app.community
-    app.message
-    app.oauth
-    app.rent
-    app.reserve
-    app.reserve_choice
+    api
 
 
 Indices and tables
