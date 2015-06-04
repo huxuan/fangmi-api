@@ -156,7 +156,7 @@ class ListAPI(Resource):
             }
 
         :<header Authorization: OAuth access_token
-        :query int apartment_id: 租房记录 ID
+        :query int apartment_id: 房屋 ID
         :>json string message: 可能的错误信息
         :>json int status_code: 状态代码
         :>json array rents: 租房记录列表的 serialize 信息
