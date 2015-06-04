@@ -90,8 +90,7 @@ class ReserveChoiceAPI(Resource):
             }
 
         :<header Authorization: OAuth access_token, 只有房东才有权限
-        :query int apartment_id: **Required** 租房对应的房屋 ID\
-（注意是 Apartment 的，不是 Room 的）
+        :query int apartment_id: **Required** 房屋 ID
         :query date date: **Required** 预约日期
         :query time time_start: **Required** 预约开始时间
         :query time time_end: **Required** 预约结束时间
