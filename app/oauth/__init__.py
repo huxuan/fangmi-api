@@ -89,6 +89,30 @@ pass=<access_token>&sns=wechat
 @bp_oauth.route('/me')
 @oauth.require_oauth()
 def me():
+    """ 验证是否登录成功
+
+    **Example Request**:
+
+    .. sourcecode:: http
+
+        GET /oauth/me
+        Authorization: Bearer YSj3GtbBvEWmFkL0hhH26PWQrpbSef
+
+    **Example Response**:
+
+    .. sourcecode:: http
+
+        {
+            "message": "OK",
+            "status_code": 200,
+            "status": "登录成功！"
+        }
+
+    :<header Authorization: OAuth access_token
+    :>json string message: 可能的错误信息
+    :>json int status_code: 状态代码
+    :>json string status: 状态信息
+    """
     return utils.api_response(payload={u'status': u'登录成功！'})
 
 
