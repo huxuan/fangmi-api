@@ -11,6 +11,7 @@ from datetime import datetime
 from datetime import time
 
 from app import app
+from app import db
 from app import models
 from app import utils
 
@@ -20,17 +21,19 @@ COMMUNITIES = []
 class Fake(object):
 
     def __init__(self):
-        self.fake_client()
-        self.fake_admin()
-        self.fake_user()
-        self.fake_school()
-        self.fake_community()
-        self.fake_school_community()
-        self.fake_apartment()
-        self.fake_apartment_photo()
-        self.fake_apartment_rent()
-        self.fake_apartment_reserve()
-        self.fake_user_fav_apartment()
+        # self.fake_client()
+        # self.fake_admin()
+        # self.fake_user()
+        # self.fake_school()
+        # self.fake_community()
+        # self.fake_school_community()
+        # self.fake_apartment()
+        # self.fake_apartment_photo()
+        # self.fake_apartment_rent()
+        # self.fake_apartment_reserve()
+        # self.fake_user_fav_apartment()
+        self.real_user()
+        db.session.commit()
 
     def fake_client(self):
         self.clients = [
@@ -56,6 +59,13 @@ class Fake(object):
                 app.config['DEFAULT_AVATAR_MD5'],
             ))
         self.user_list = [user.serialize() for user in self.users]
+
+    def real_user(self):
+        fangmi_msg_user = models.User.create(u'房蜜提醒', u'FunMiNotify')
+        fangmi_msg_user.avatar = file(utils.get_path_from_md5(
+            app.config['UPLOAD_AVATAR_FOLDER'],
+            'a687d3bbae64f8183cbf213ab1e1eda7',
+        ))
 
     def fake_school(self):
         self.schools = [
