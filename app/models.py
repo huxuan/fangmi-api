@@ -357,7 +357,11 @@ class School(db.Model):
     def num_apartments(self):
         community_ids = [community.id
             for community in self.community_list]
-        res = Apartment.query.filter(Apartment.community_id.in_(community_ids))
+        if community_ids:
+            res = Apartment.query.filter(
+                Apartment.community_id.in_(community_ids))
+        else:
+            return 0
         return res.count()
 
     @classmethod
