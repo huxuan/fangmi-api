@@ -96,7 +96,7 @@ class Fake(object):
         self.apartments = [
             models.Apartment.create(
                 self.users[0].username,
-                self.communities[1].id,
+                self.communities[0].id,
                 title=u'标题1 而且 要 长',
                 subtitle=u'副标题也要长长的才有感觉嘛',
                 address=u'地址虽然是小三，但也要浪的长~',
