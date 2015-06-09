@@ -87,7 +87,6 @@ pass=<access_token>&sns=wechat
 
 
 @bp_oauth.route('/me')
-@oauth.require_oauth()
 def me():
     """ 验证是否登录成功
 
@@ -98,6 +97,8 @@ def me():
         GET /oauth/me
         Authorization: Bearer YSj3GtbBvEWmFkL0hhH26PWQrpbSef
 
+        GET /oauth/me
+
     **Example Response**:
 
     .. sourcecode:: http
@@ -105,15 +106,31 @@ def me():
         {
             "message": "OK",
             "status_code": 200,
-            "status": "登录成功！"
+            "status": "Welcome to Funmi, <username>!"
         }
 
-    :<header Authorization: OAuth access_token
+        {
+            "message": "OK",
+            "status_code": 200,
+            "status": "Welcome to Funmi, but you need to sign in to enjoy more \
+fantastic features!"
+        }
+
+    :<header Authorization: OAuth access_token. 如果有 token，返回信息会包含 \
+username, 否则会是一般性的提示信息。
     :>json string message: 可能的错误信息
     :>json int status_code: 状态代码
     :>json string status: 状态信息
     """
-    return utils.api_response(payload={u'status': u'登录成功！'})
+    valid, req = oauth.verify_request([])
+    if valid:
+        status = 'Welcome to FunMi, {}!'.format(req.user.username)
+    else:
+        status = (
+            'Welcome to Funmi, '
+            'but you need to sign in to enjoy more fantastic features!'
+        )
+    return utils.api_response(payload={u'status': status})
 
 
 @bp_oauth.route('/')
