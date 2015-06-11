@@ -1267,6 +1267,12 @@ class Reserve(db.Model):
     @classmethod
     def create(cls, username, reserve_choice_id):
         reserve_choice = ReserveChoice.get(reserve_choice_id)
+        # Only one valid reserve for a user and an apartment.
+        if cls.query.filter_by(username=username,
+            apartment_id=reserve_choice.apartment_id,
+            cancelled=False, deleted=0).count() > 0:
+            raise utils.APIException(utils.API_CODE_DUPLICATE,
+                name=cls.__tablename__)
         reserve = cls(
             username=username,
             apartment_id=reserve_choice.apartment_id,
