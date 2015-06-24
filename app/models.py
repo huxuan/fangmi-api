@@ -448,6 +448,8 @@ class Community(db.Model):
     name = db.Column(db.String(32), nullable=False, unique=True, index=True)
     address = db.Column(db.String(255))
     traffic = db.Column(db.String(255))
+    funmi_community_id = db.Column(db.String(32))
+    location = db.Column(db.String(255))
     map_md5 = db.Column(db.String(32))
 
     created_at = db.Column(db.DateTime, default=datetime.now)
@@ -484,11 +486,13 @@ class Community(db.Model):
         return self.apartment_list.count()
 
     @classmethod
-    def create(cls, name, address, traffic, map):
+    def create(cls, name, address, traffic, funmi_community_id, location, map):
         community = cls(
             name=name,
             address=address,
             traffic=traffic,
+            funmi_community_id=funmi_community_id,
+            location=location,
             map=map,
         )
         db.session.add(community)
@@ -553,6 +557,8 @@ class Community(db.Model):
             name=self.name,
             address=self.address,
             traffic=self.traffic,
+            funmi_community_id=self.funmi_community_id,
+            location=self.location,
             map=self.map,
             schools=self.schools,
             #apartments=self.apartments,
